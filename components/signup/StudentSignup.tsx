@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import { useEffect, useState } from "react";
 import {
   EXPERIENCE_LEVELS,
@@ -53,6 +54,8 @@ export default function StudentSignup({ onBack }: StudentSignupProps) {
   const [years, setYears] = useState("");
 
   const [redirectIn, setRedirectIn] = useState(5);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   // The user's own info — barred from appearing anywhere in the password.
   const forbiddenTerms = [name, email, phone];
@@ -82,12 +85,45 @@ export default function StudentSignup({ onBack }: StudentSignupProps) {
     }
   };
 
-  const create = () => {
-    if (page2Ok) {
+  const create = async () => {
+    if (!page2Ok) {
+      setTried(true);
+      return;
+    }
+    setSubmitting(true);
+    setSubmitError(null);
+    try {
+      const res = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+          phone,
+          experienceLevel: level,
+          targetRole,
+          learningStyle: learning,
+          yearsOfExperience: years,
+        }),
+      });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as { error?: string };
+        setSubmitError(data.error ?? "Could not create your account.");
+        return;
+      }
+      // Account created — sign the new student in, then show the success step.
+      await signIn("credentials", {
+        email: email.trim(),
+        password,
+        redirect: false,
+      });
       setStep(2);
       setTried(false);
-    } else {
-      setTried(true);
+    } catch {
+      setSubmitError("Network error. Please try again.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -214,6 +250,25 @@ export default function StudentSignup({ onBack }: StudentSignupProps) {
             />
 
             <div className="pt-1 sm:col-span-2">
+              <button
+                type="button"
+                onClick={() =>
+                  signIn("github", { callbackUrl: "/student/dashboard" })
+                }
+                className="flex w-full items-center justify-center gap-2.5 rounded-lg border border-lightgray bg-white px-5 py-3 text-sm font-semibold text-navy transition-colors hover:bg-[#f9fafb]"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M12 .5C5.73.5.5 5.73.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-2c-3.2.7-3.88-1.54-3.88-1.54-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.71.08-.71 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.69 5.39-5.25 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.68.8.56A10.52 10.52 0 0 0 23.5 12C23.5 5.73 18.27.5 12 .5z" />
+                </svg>
+                Sign up with GitHub
+              </button>
+
+              <div className="my-4 flex items-center gap-3 text-xs text-mediumgray">
+                <span className="h-px flex-1 bg-lightgray" />
+                or with email
+                <span className="h-px flex-1 bg-lightgray" />
+              </div>
+
               <button type="button" onClick={goNext} className={`w-full ${PRIMARY_BTN}`}>
                 Next
               </button>
@@ -290,6 +345,12 @@ export default function StudentSignup({ onBack }: StudentSignupProps) {
               />
             </div>
 
+            {submitError && (
+              <p className="rounded-lg bg-orange/5 px-3 py-2 text-sm text-orange sm:col-span-2">
+                {submitError}
+              </p>
+            )}
+
             <div className="flex items-center gap-3 pt-1 sm:col-span-2">
               <button
                 type="button"
@@ -301,8 +362,13 @@ export default function StudentSignup({ onBack }: StudentSignupProps) {
               >
                 Back
               </button>
-              <button type="button" onClick={create} className={`flex-1 ${PRIMARY_BTN}`}>
-                Create Account
+              <button
+                type="button"
+                onClick={create}
+                disabled={submitting}
+                className={`flex-1 ${PRIMARY_BTN} disabled:opacity-60`}
+              >
+                {submitting ? "Creating…" : "Create Account"}
               </button>
             </div>
           </div>
