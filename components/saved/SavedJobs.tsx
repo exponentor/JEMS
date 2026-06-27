@@ -1,0 +1,109 @@
+"use client";
+
+import { useState } from "react";
+import { Bookmark, MapPin, Trash2 } from "lucide-react";
+import Link from "next/link";
+import DashboardShell from "@/components/dashboard/student/DashboardShell";
+import PageHeader from "@/components/dashboard/student/PageHeader";
+import { Card } from "@/components/dashboard/student/ui";
+
+interface Job {
+  id: string;
+  role: string;
+  company: string;
+  match: number;
+  location: string;
+  salary: string;
+  saved: string;
+}
+
+const INITIAL: Job[] = [
+  { id: "s1", role: "Frontend Developer", company: "Stripe", match: 92, location: "Remote", salary: "$120k–150k", saved: "2d ago" },
+  { id: "s2", role: "Frontend Engineer", company: "Vercel", match: 90, location: "Remote", salary: "$110k–140k", saved: "3d ago" },
+  { id: "s3", role: "UI Engineer", company: "Razorpay", match: 81, location: "Hybrid", salary: "₹14–20 LPA", saved: "5d ago" },
+];
+
+function matchTone(match: number) {
+  if (match >= 90) return "bg-emerald/10 text-emerald";
+  if (match >= 80) return "bg-slate/10 text-slate";
+  return "bg-gold/10 text-[#b45309]";
+}
+
+export default function SavedJobs() {
+  const [jobs, setJobs] = useState<Job[]>(INITIAL);
+  const remove = (id: string) => setJobs((j) => j.filter((x) => x.id !== id));
+
+  return (
+    <DashboardShell>
+      <div className="mx-auto max-w-6xl space-y-6">
+        <PageHeader title="Saved Jobs" crumb="Saved Jobs" />
+
+        {jobs.length === 0 ? (
+          <Card className="flex flex-col items-center justify-center px-6 py-16 text-center">
+            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-slate/10 text-slate">
+              <Bookmark className="h-6 w-6" />
+            </span>
+            <p className="mt-4 text-sm font-semibold text-navy">No saved jobs yet</p>
+            <p className="mt-1 text-xs text-mediumgray">
+              Save roles from Job Matches to revisit them here.
+            </p>
+            <Link
+              href="/student/jobs"
+              className="mt-5 rounded-lg bg-navy px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#1f2937]"
+            >
+              Browse Job Matches
+            </Link>
+          </Card>
+        ) : (
+          <>
+            <p className="text-sm text-mediumgray">
+              <span className="font-semibold text-navy">{jobs.length}</span> saved roles
+            </p>
+            <div className="space-y-4">
+              {jobs.map((j) => (
+                <Card key={j.id} className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#f1f5f9] text-base font-bold text-navy">
+                    {j.company.charAt(0)}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="text-base font-bold text-navy">{j.role}</h3>
+                      <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${matchTone(j.match)}`}>
+                        {j.match}% match
+                      </span>
+                    </div>
+                    <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-mediumgray">
+                      <span className="font-medium text-navy">{j.company}</span>
+                      <span className="inline-flex items-center gap-1">
+                        <MapPin className="h-3.5 w-3.5" />
+                        {j.location}
+                      </span>
+                      <span>{j.salary}</span>
+                      <span>· Saved {j.saved}</span>
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => remove(j.id)}
+                      aria-label="Remove"
+                      className="flex h-10 w-10 items-center justify-center rounded-lg border border-lightgray text-mediumgray transition-colors hover:border-[#EF4444] hover:bg-[#fee2e2] hover:text-[#EF4444]"
+                    >
+                      <Trash2 className="h-5 w-5" />
+                    </button>
+                    <button
+                      type="button"
+                      className="rounded-lg bg-primary-gradient px-5 py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(59,130,246,0.25)] transition-transform hover:-translate-y-0.5"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    </DashboardShell>
+  );
+}

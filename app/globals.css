@@ -1,0 +1,425 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ============================================
+   JEMS DESIGN SYSTEM — Light Premium Theme
+   ============================================ */
+
+@theme {
+  /* Brand colors */
+  --color-navy: #111827;
+  --color-slate: #3b82f6;
+  --color-orange: #ea580c;
+  --color-gold: #f59e0b;
+  --color-emerald: #10b981;
+  --color-offwhite: #fffbf0;
+  --color-lightgray: #e5e7eb;
+  --color-mediumgray: #6b7280;
+
+  /* Typography */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* Shadows — subtle premium */
+  --shadow-soft: 0 2px 8px rgba(17, 24, 39, 0.06);
+  --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-cta: 0 6px 20px rgba(234, 88, 12, 0.25);
+  --shadow-primary: 0 6px 20px rgba(59, 130, 246, 0.25);
+
+  /* Animations */
+  --animate-fade-in: fade-in 0.2s ease-out;
+  --animate-slide-down: slide-down 0.25s ease-out;
+  --animate-ring: ring-fill 1.2s ease-out forwards;
+  --animate-float: float 9s ease-in-out infinite;
+  --animate-float-slow: float 14s ease-in-out infinite;
+  --animate-pulse-glow: pulse-glow 6s ease-in-out infinite;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(0, -28px, 0) scale(1.06);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.75;
+    transform: scale(1.08);
+  }
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  /* Custom themed cursor — a crisp orange arrow with a soft white outline. */
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Cpath d='M5 3 L5 22 L10 17.5 L13.4 24.5 L16.2 23.2 L12.8 16.5 L19 16.5 Z' fill='%23EA580C' stroke='white' stroke-width='1.4' stroke-linejoin='round'/%3E%3C/svg%3E")
+      4 3,
+    auto;
+}
+
+/* Interactive elements get a themed pointing-finger (hand) cursor with a
+   noticeably long index finger. */
+a,
+button,
+[role="button"],
+[role="menuitem"],
+label[for],
+summary,
+.cursor-pointer {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='34' height='34' viewBox='0 0 34 34'%3E%3Cpath d='M11 1c-1.1 0-2 .9-2 2v13.4L7.6 14.8c-.8-.8-2-.8-2.8 0s-.8 2 0 2.8l5.2 5.6c.9 1 2.2 1.6 3.7 1.6h3.1c2.8 0 5-2.2 5-5v-5.6c0-1.1-.9-2-2-2-.3 0-.6.1-.9.2-.2-.9-1-1.6-1.9-1.6-.4 0-.7.1-1 .3-.3-.7-1-1.2-1.8-1.2-.3 0-.6.1-.9.2V3c0-1.1-.9-2-2-2z' fill='%23FED7AA' stroke='%23FB923C' stroke-width='1.3' stroke-linejoin='round'/%3E%3C/svg%3E")
+      10 1,
+    pointer;
+}
+
+/* While pressing, the index finger retracts — a "finger clicking" feel. */
+a:active,
+button:active,
+[role="button"]:active,
+[role="menuitem"]:active,
+label[for]:active,
+summary:active,
+.cursor-pointer:active {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='34' height='34' viewBox='0 0 34 34'%3E%3Cpath d='M11 7c-1.1 0-2 .9-2 2v7.4L7.6 14.8c-.8-.8-2-.8-2.8 0s-.8 2 0 2.8l5.2 5.6c.9 1 2.2 1.6 3.7 1.6h3.1c2.8 0 5-2.2 5-5v-5.6c0-1.1-.9-2-2-2-.3 0-.6.1-.9.2-.2-.9-1-1.6-1.9-1.6-.4 0-.7.1-1 .3-.3-.7-1-1.2-1.8-1.2-.3 0-.6.1-.9.2V9c0-1.1-.9-2-2-2z' fill='%23FDBA74' stroke='%23F97316' stroke-width='1.3' stroke-linejoin='round'/%3E%3Cpath d='M8 4l-1.6-1.6M11 3V1M14 4l1.6-1.6' stroke='%23FB923C' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E")
+      10 7,
+    pointer;
+}
+
+/* Branded text selection — soft orange highlight matching the theme. */
+::selection {
+  background-color: rgba(251, 146, 60, 0.32);
+}
+::-moz-selection {
+  background-color: rgba(251, 146, 60, 0.32);
+}
+
+/* Reusable gradient utilities */
+
+/* Orange — reserved for top-of-funnel conversion CTAs & urgency only. */
+.bg-cta-gradient {
+  background-image: linear-gradient(135deg, #ea580c 0%, #f59e0b 100%);
+}
+
+/* Slate blue — the primary in-app / dashboard action color. */
+.bg-primary-gradient {
+  background-image: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.bg-hero-gradient {
+  background-image: linear-gradient(180deg, #ffffff 0%, #f5f9ff 100%);
+}
+
+/* Single continuous page canvas — rendered once as a fixed layer behind ALL
+   content (see app/layout.tsx). Every section is transparent and shares this
+   exact background, so there are no per-section seams. */
+.bg-page-canvas {
+  background-color: #fffdfa;
+  background-image:
+    radial-gradient(75% 60% at 15% 0%, rgba(234, 88, 12, 0.05), transparent 85%),
+    radial-gradient(75% 60% at 85% 5%, rgba(59, 130, 246, 0.05), transparent 85%),
+    radial-gradient(90% 70% at 50% 100%, rgba(245, 158, 11, 0.04), transparent 85%);
+}
+
+/* Auto-scrolling logo marquee (Companies section). */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 38s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation: none;
+  }
+}
+
+/* Radial spotlight + dotted texture layers for the hero background. */
+.bg-hero-spotlight {
+  background-image:
+    radial-gradient(60% 55% at 50% 0%, rgba(234, 88, 12, 0.1) 0%, transparent 70%),
+    radial-gradient(45% 45% at 85% 20%, rgba(59, 130, 246, 0.12) 0%, transparent 70%),
+    radial-gradient(40% 40% at 10% 70%, rgba(245, 158, 11, 0.1) 0%, transparent 70%);
+}
+
+.bg-hero-dots {
+  background-image: radial-gradient(rgba(17, 24, 39, 0.06) 1px, transparent 1px);
+  background-size: 22px 22px;
+  -webkit-mask-image: radial-gradient(70% 60% at 50% 35%, #000 0%, transparent 75%);
+  mask-image: radial-gradient(70% 60% at 50% 35%, #000 0%, transparent 75%);
+}
+
+/* Smooth scroll for in-page anchors */
+html {
+  scroll-behavior: smooth;
+  /* Offset anchor scrolling for the fixed navbar (h-16). */
+  scroll-padding-top: 4.5rem;
+  /* Soft orange scrollbar (Firefox). */
+  scrollbar-color: #fdba74 #fffbf0;
+  scrollbar-width: thin;
+}
+
+/* Orange-themed scrollbar (WebKit / Chromium / Edge). */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #fffbf0;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 9999px;
+  border: 3px solid #fffbf0;
+  background: linear-gradient(180deg, #fdba74 0%, #fcd9b6 100%);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #fb923c 0%, #fdba74 100%);
+}
+
+::-webkit-scrollbar-corner {
+  background: #fffbf0;
+}
+
+/* ── Click ripple (macOS-style tap feedback) ─────────────────────── */
+.click-ripple {
+  position: fixed;
+  z-index: 9999;
+  /* Keep width === height and margin === -half so it stays a centered circle. */
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(
+    circle,
+    rgba(234, 88, 12, 0.5) 0%,
+    rgba(234, 88, 12, 0.3) 55%,
+    transparent 72%
+  );
+  border: 1.5px solid rgba(234, 88, 12, 0.8);
+  animation: click-ripple 0.95s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes click-ripple {
+  0% {
+    transform: scale(0.25);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .click-ripple {
+    display: none;
+  }
+}
+
+@theme inline {
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+/* ── Signup flow: role-based accent theming ──────────────────────── */
+.signup-accent {
+  /* Modern indigo — replaces the dated primary blue for the student flow. */
+  --accent: #6366f1;
+  --accent-tint: #eef2ff;
+  --accent-focus: rgba(99, 102, 241, 0.18);
+}
+.signup-accent[data-accent="orange"] {
+  --accent: #ea580c;
+  --accent-tint: #fff3e6;
+  --accent-focus: rgba(234, 88, 12, 0.15);
+}
+
+/* Shadows for depth — inputs carry no border, only layered shadow. */
+.signup-input {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+.signup-input:focus {
+  box-shadow: 0 4px 12px var(--accent-focus);
+}
+.signup-input[aria-invalid="true"] {
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15);
+}
+
+/* Print only the resume sheet when "Download as PDF" calls window.print(). */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .resume-print,
+  .resume-print * {
+    visibility: visible;
+  }
+  .resume-print {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    width: 100%;
+    max-width: none;
+    box-shadow: none;
+    aspect-ratio: auto;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}

@@ -1,0 +1,139 @@
+"use client";
+
+import { Award, BookOpen, Flame, Mic, Trophy } from "lucide-react";
+import DashboardShell from "@/components/dashboard/student/DashboardShell";
+import PageHeader from "@/components/dashboard/student/PageHeader";
+import { Card, ProgressBar } from "@/components/dashboard/student/ui";
+import { skills, student } from "@/components/dashboard/student/data";
+
+const TILES = [
+  { label: "Lessons completed", value: "24", icon: BookOpen },
+  { label: "Mock interviews", value: "12", icon: Mic },
+  { label: "Day streak", value: "3", icon: Flame },
+  { label: "Badges earned", value: "5", icon: Award },
+];
+
+const WEEK = [
+  { day: "M", v: 40 },
+  { day: "T", v: 70 },
+  { day: "W", v: 55 },
+  { day: "T", v: 90 },
+  { day: "F", v: 65 },
+  { day: "S", v: 30 },
+  { day: "S", v: 50 },
+];
+
+const ACHIEVEMENTS = [
+  { title: "First Resume", earned: true },
+  { title: "5 Interviews", earned: true },
+  { title: "Skill Master", earned: true },
+  { title: "3-Day Streak", earned: true },
+  { title: "First Application", earned: true },
+  { title: "10 Interviews", earned: false },
+  { title: "Job Offer", earned: false },
+  { title: "Path Complete", earned: false },
+];
+
+export default function MyProgress() {
+  return (
+    <DashboardShell>
+      <div className="mx-auto max-w-6xl space-y-6">
+        <PageHeader title="My Progress" crumb="My Progress" />
+
+        {/* Readiness */}
+        <Card className="p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-sm font-semibold text-navy">Overall job readiness</h2>
+              <p className="mt-1 text-xs text-mediumgray">Keep going — you&apos;re on track.</p>
+            </div>
+            <span className="text-2xl font-bold text-slate">{student.readiness}%</span>
+          </div>
+          <div className="mt-4">
+            <ProgressBar value={student.readiness} />
+          </div>
+        </Card>
+
+        {/* Tiles */}
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          {TILES.map((t) => {
+            const Icon = t.icon;
+            return (
+              <Card key={t.label} className="p-5">
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate/10 text-slate">
+                  <Icon className="h-[18px] w-[18px]" />
+                </span>
+                <p className="mt-3 text-2xl font-bold text-navy">{t.value}</p>
+                <p className="text-xs text-mediumgray">{t.label}</p>
+              </Card>
+            );
+          })}
+        </div>
+
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {/* Weekly activity */}
+          <Card className="p-6">
+            <h2 className="text-sm font-semibold text-navy">This week&apos;s activity</h2>
+            <div className="mt-5 flex h-40 items-end justify-between gap-3">
+              {WEEK.map((d, i) => (
+                <div key={i} className="flex flex-1 flex-col items-center gap-2">
+                  <div className="flex w-full flex-1 items-end">
+                    <div
+                      className="w-full rounded-md bg-primary-gradient"
+                      style={{ height: `${d.v}%` }}
+                    />
+                  </div>
+                  <span className="text-xs text-mediumgray">{d.day}</span>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* Skills */}
+          <Card className="p-6">
+            <h2 className="text-sm font-semibold text-navy">Skill proficiency</h2>
+            <ul className="mt-4 space-y-3.5">
+              {skills.map((s) => (
+                <li key={s.name}>
+                  <div className="mb-1 flex justify-between text-xs">
+                    <span className="font-medium text-navy">{s.name}</span>
+                    <span className="text-mediumgray">{s.level}%</span>
+                  </div>
+                  <ProgressBar value={s.level} barClass="bg-navy" />
+                </li>
+              ))}
+            </ul>
+          </Card>
+        </div>
+
+        {/* Achievements */}
+        <Card className="p-6">
+          <div className="flex items-center gap-2">
+            <Trophy className="h-4 w-4 text-gold" />
+            <h2 className="text-sm font-semibold text-navy">Achievements</h2>
+          </div>
+          <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
+            {ACHIEVEMENTS.map((a) => (
+              <div
+                key={a.title}
+                className={`flex flex-col items-center rounded-xl border p-4 text-center ${
+                  a.earned ? "border-lightgray bg-white" : "border-dashed border-lightgray bg-[#f8fafc] opacity-60"
+                }`}
+              >
+                <span
+                  className={`flex h-10 w-10 items-center justify-center rounded-full ${
+                    a.earned ? "bg-gold/15 text-[#b45309]" : "bg-lightgray text-mediumgray"
+                  }`}
+                >
+                  <Award className="h-5 w-5" />
+                </span>
+                <p className="mt-2 text-xs font-semibold text-navy">{a.title}</p>
+                <p className="text-[11px] text-mediumgray">{a.earned ? "Earned" : "Locked"}</p>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
+    </DashboardShell>
+  );
+}
