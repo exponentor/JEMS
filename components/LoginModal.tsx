@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import type { UserRole } from "./types";
 
@@ -104,9 +105,13 @@ export default function LoginModal({
         style={{ animation: "fade-in 0.2s ease-out" }}
       >
         <div className="mb-5 text-center">
-          <h2 className="text-2xl font-extrabold tracking-tight text-navy">
-            jems<span className="text-orange">.</span>
-          </h2>
+          <Image
+            src="/logo.png"
+            alt="Jems"
+            width={782}
+            height={697}
+            className="mx-auto h-8 w-auto"
+          />
           <p className="mt-1 text-sm text-mediumgray">
             {intendedRole === "company"
               ? "Sign in to your company account"

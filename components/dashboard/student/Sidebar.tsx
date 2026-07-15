@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -143,9 +144,13 @@ export default function Sidebar({
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-navy text-base font-extrabold text-white">
             j
           </span>
-          <span className={`${reveal} text-lg font-extrabold tracking-tight text-navy`}>
-            jems<span className="text-orange">.</span>
-          </span>
+          <Image
+            src="/logo.png"
+            alt="Jems"
+            width={782}
+            height={697}
+            className={`${reveal} h-6 w-auto`}
+          />
         </Link>
 
         {/* User card */}

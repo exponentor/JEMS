@@ -43,8 +43,8 @@ export default function Navbar({
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-lightgray/70 bg-white/95 backdrop-blur-sm shadow-[var(--shadow-soft)]">
-      <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8">
-        <Logo />
+      <div className="relative mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8">
+        <Logo className="h-16 mt-2" />
 
         {/* Desktop center + right (hidden on mobile) */}
         {isAuthenticated ? (

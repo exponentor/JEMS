@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 interface FooterColumn {
   title: string;
   links: { label: string; href: string }[];
@@ -52,9 +54,7 @@ export default function Footer() {
         {/* Top: brand + newsletter */}
         <div className="flex flex-col gap-10 border-b border-white/10 pb-12 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-sm">
-            <span className="text-2xl font-extrabold tracking-tight">
-              jems<span className="text-orange">.</span>
-            </span>
+            <Image src="/logo.png" alt="Jems" width={782} height={697} className="h-8 w-auto" />
             <h2 className="mt-6 text-lg font-bold">Stay Updated</h2>
             <p className="mt-2 text-sm text-lightgray">
               Get weekly tips to land your dream job.

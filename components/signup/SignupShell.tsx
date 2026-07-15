@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
+import Logo from "@/components/Navbar/Logo";
 
 /**
  * Signup chrome — a single, full-width white screen (no side panel, no
@@ -12,12 +13,7 @@ export default function SignupShell({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col bg-white">
       <header className="flex items-center px-6 py-5 lg:px-10">
-        <Link
-          href="/"
-          className="text-xl font-extrabold tracking-tight text-navy"
-        >
-          jems<span className="text-orange">.</span>
-        </Link>
+        <Logo className="h-7" />
         <Link
           href="/login"
           className="ml-auto text-sm font-semibold text-navy transition-colors hover:text-navy/70"

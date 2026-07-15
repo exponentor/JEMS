@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Logo from "@/components/Navbar/Logo";
 
 export const metadata: Metadata = {
   title: "Company Dashboard — Jems",
@@ -12,9 +13,7 @@ export const metadata: Metadata = {
 export default function CompanyDashboardPage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center px-6 text-center">
-      <Link href="/" className="text-2xl font-extrabold tracking-tight text-navy">
-        jems<span className="text-orange">.</span>
-      </Link>
+      <Logo className="h-8" />
       <span className="mt-8 inline-flex items-center rounded-full bg-emerald/10 px-4 py-1.5 text-sm font-semibold text-emerald">
         Company created
       </span>

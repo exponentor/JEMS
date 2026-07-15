@@ -7,6 +7,7 @@ import { Suspense, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { ForgotPasswordFlow } from "@/components/auth/ForgotPasswordFlow";
 import GithubButton from "@/components/GithubButton";
+import Logo from "@/components/Navbar/Logo";
 
 const valueProps = [
   "AI-personalized learning paths",
@@ -64,9 +65,9 @@ export default function LoginPage() {
           <div className="absolute -bottom-20 -right-10 h-80 w-80 rounded-full bg-slate/20 blur-3xl" />
         </div>
 
-        <Link href="/" className="relative text-2xl font-extrabold tracking-tight">
-          jems<span className="text-orange">.</span>
-        </Link>
+        <div className="relative">
+          <Logo className="h-8" />
+        </div>
 
         <div className="relative max-w-md">
           <h1 className="text-3xl font-extrabold leading-tight sm:text-4xl">
@@ -100,12 +101,9 @@ export default function LoginPage() {
       <main className="flex items-center justify-center px-6 py-12 sm:px-12">
         <div className="w-full max-w-sm">
           {/* Mobile logo */}
-          <Link
-            href="/"
-            className="mb-8 inline-block text-2xl font-extrabold tracking-tight text-navy lg:hidden"
-          >
-            jems<span className="text-orange">.</span>
-          </Link>
+          <div className="mb-8 lg:hidden">
+            <Logo className="h-8" />
+          </div>
 
           {mode === "forgot" ? (
             <ForgotPasswordFlow onBackToLogin={() => setMode("login")} />
