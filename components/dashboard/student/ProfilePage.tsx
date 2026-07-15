@@ -1,11 +1,14 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Briefcase,
   Camera,
   Check,
   Globe,
+  Loader2,
   Mail,
   MapPin,
   Phone,
@@ -16,7 +19,7 @@ import {
 } from "lucide-react";
 import DashboardShell from "./DashboardShell";
 import PageHeader from "./PageHeader";
-import { student } from "./data";
+import type { StudentProfileView } from "@/lib/db/student-data";
 
 type IconType = React.ComponentType<{ className?: string }>;
 
@@ -32,7 +35,7 @@ const GithubIcon: IconType = ({ className }) => (
   </svg>
 );
 
-/** A built-in gallery of avatars the user can pick from (DiceBear, rendered at runtime). */
+/** A built-in gallery of avatars the user can pick from (DiceBear). */
 const AVATAR_SEEDS = [
   "Felix", "Aneka", "Milo", "Zoe", "Kai", "Luna",
   "Rex", "Nova", "Theo", "Ivy", "Atlas", "Mira",
@@ -41,13 +44,12 @@ const AVATAR_SEEDS = [
 const avatarUrl = (seed: string) =>
   `https://api.dicebear.com/9.x/avataaars/svg?seed=${encodeURIComponent(seed)}&backgroundColor=ffd5dc,c0aede,d1d4f9,b6e3f4,ffdfbf`;
 
-const STATS = [
-  { label: "Applications", value: "12", Icon: Briefcase },
-  { label: "Job Matches", value: "37", Icon: Target },
-  { label: "Interviews", value: "5", Icon: Check },
-];
-
-const TABS = ["Profile", "Activity", "Saved Jobs", "Settings"];
+const TABS = ["Profile", "Activity", "Saved Jobs", "Settings"] as const;
+const TAB_LINKS: Record<string, string> = {
+  Activity: "/student/progress",
+  "Saved Jobs": "/student/saved",
+  Settings: "/student/settings",
+};
 
 const SOCIALS = [
   { Icon: Phone, tone: "bg-emerald", label: "Call" },
@@ -55,20 +57,24 @@ const SOCIALS = [
   { Icon: Send, tone: "bg-slate", label: "Telegram" },
 ];
 
-/** A labelled text input matching the Constructor-X form style. */
+/** A labelled, controlled text input matching the form style. */
 function Field({
   label,
-  defaultValue,
+  value,
+  onChange,
   placeholder,
   type = "text",
   required,
+  disabled,
   Icon,
 }: {
   label: string;
-  defaultValue?: string;
+  value: string;
+  onChange?: (v: string) => void;
   placeholder?: string;
   type?: string;
   required?: boolean;
+  disabled?: boolean;
   Icon?: IconType;
 }) {
   return (
@@ -83,9 +89,11 @@ function Field({
         )}
         <input
           type={type}
-          defaultValue={defaultValue}
+          value={value}
+          disabled={disabled}
+          onChange={(e) => onChange?.(e.target.value)}
           placeholder={placeholder}
-          className={`h-11 w-full rounded-xl border border-lightgray bg-white pr-3.5 text-sm text-navy outline-none transition-colors placeholder:text-mediumgray focus:border-slate focus:ring-2 focus:ring-slate/15 ${
+          className={`h-11 w-full rounded-xl border border-lightgray bg-white pr-3.5 text-sm text-navy outline-none transition-colors placeholder:text-mediumgray focus:border-slate focus:ring-2 focus:ring-slate/15 disabled:bg-[#f1f5f9] disabled:text-mediumgray ${
             Icon ? "pl-9" : "pl-3.5"
           }`}
         />
@@ -102,18 +110,123 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function ProfilePage() {
-  const [avatar, setAvatar] = useState<string>(avatarUrl("Felix"));
+interface ProfileStats {
+  applications: number;
+  matches: number;
+  interviews: number;
+}
+
+/** Local, editable copy of the persisted profile. */
+type Form = {
+  firstName: string;
+  lastName: string;
+  username: string;
+  nickname: string;
+  displayName: string;
+  displayRole: string;
+  bio: string;
+  location: string;
+  website: string;
+  linkedin: string;
+  github: string;
+  whatsapp: string;
+  telegram: string;
+  phone: string;
+  targetRole: string;
+  avatar: string;
+};
+
+function toForm(p: StudentProfileView): Form {
+  return {
+    firstName: p.firstName,
+    lastName: p.lastName,
+    username: p.username,
+    nickname: p.nickname,
+    displayName: p.displayName,
+    displayRole: p.displayRole,
+    bio: p.bio,
+    location: p.location,
+    website: p.website,
+    linkedin: p.linkedin,
+    github: p.github,
+    whatsapp: p.whatsapp,
+    telegram: p.telegram,
+    phone: p.phone,
+    targetRole: p.targetRole,
+    avatar: p.avatar || avatarUrl("Felix"),
+  };
+}
+
+export default function ProfilePage({
+  profile,
+  stats,
+}: {
+  profile: StudentProfileView;
+  stats: ProfileStats;
+}) {
+  const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
-  const [activeTab, setActiveTab] = useState("Profile");
+  const [activeTab, setActiveTab] = useState<string>("Profile");
+
+  // `saved` is the last persisted snapshot; `form` is the working copy.
+  const [saved, setSaved] = useState<Form>(() => toForm(profile));
+  const [form, setForm] = useState<Form>(() => toForm(profile));
+  const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+
+  const set = <K extends keyof Form>(key: K, value: Form[K]) => {
+    setForm((f) => ({ ...f, [key]: value }));
+    setStatus("idle");
+  };
+
+  const dirty = (Object.keys(form) as (keyof Form)[]).some(
+    (k) => form[k] !== saved[k],
+  );
+
+  const STAT_TILES = [
+    { label: "Applications", value: String(stats.applications), Icon: Briefcase },
+    { label: "Job Matches", value: String(stats.matches), Icon: Target },
+    { label: "Interviews", value: String(stats.interviews), Icon: Check },
+  ];
 
   const onUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = () => setAvatar(reader.result as string);
+    reader.onload = () => set("avatar", reader.result as string);
     reader.readAsDataURL(file);
   };
+
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus("saving");
+    try {
+      const res = await fetch("/api/student/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error("save failed");
+      const { profile: updated } = (await res.json()) as {
+        profile: StudentProfileView;
+      };
+      const next = toForm(updated);
+      setSaved(next);
+      setForm(next);
+      setStatus("saved");
+      // Refresh the layout so the sidebar / top-bar pick up the new name.
+      router.refresh();
+    } catch {
+      setStatus("error");
+    }
+  };
+
+  const onCancel = () => {
+    setForm(saved);
+    setStatus("idle");
+  };
+
+  const displayName = form.displayName || `${form.firstName} ${form.lastName}`.trim();
+  const displayTitle = form.targetRole ? `Aspiring ${form.targetRole}` : profile.title;
 
   return (
     <DashboardShell>
@@ -128,7 +241,7 @@ export default function ProfilePage() {
             <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
               {/* Stats */}
               <div className="order-2 flex gap-6 sm:order-1">
-                {STATS.map((s) => (
+                {STAT_TILES.map((s) => (
                   <div key={s.label} className="text-center">
                     <s.Icon className="mx-auto mb-1 h-5 w-5 text-slate" />
                     <p className="text-xl font-bold text-navy">{s.value}</p>
@@ -141,12 +254,14 @@ export default function ProfilePage() {
               <div className="order-1 -mt-16 flex flex-col items-center sm:order-2 sm:-mt-20">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={avatar}
+                  src={form.avatar}
                   alt="Profile avatar"
                   className="h-28 w-28 rounded-full border-4 border-white bg-white object-cover shadow-[0_8px_24px_rgba(0,0,0,0.12)]"
                 />
-                <p className="mt-2 text-base font-bold text-navy">{student.name}</p>
-                <p className="text-xs text-mediumgray">{student.title}</p>
+                <p className="mt-2 text-base font-bold text-navy">
+                  {displayName || "Your name"}
+                </p>
+                <p className="text-xs text-mediumgray">{displayTitle}</p>
               </div>
 
               {/* Socials */}
@@ -166,20 +281,30 @@ export default function ProfilePage() {
 
             {/* Tabs */}
             <div className="mt-5 flex gap-1 overflow-x-auto border-t border-lightgray pt-3">
-              {TABS.map((tab) => (
-                <button
-                  key={tab}
-                  type="button"
-                  onClick={() => setActiveTab(tab)}
-                  className={`rounded-lg px-3.5 py-2 text-sm font-medium transition-colors ${
-                    activeTab === tab
-                      ? "bg-slate/10 text-slate"
-                      : "text-mediumgray hover:bg-[#f1f5f9] hover:text-navy"
-                  }`}
-                >
-                  {tab}
-                </button>
-              ))}
+              {TABS.map((tab) =>
+                tab === "Profile" ? (
+                  <button
+                    key={tab}
+                    type="button"
+                    onClick={() => setActiveTab(tab)}
+                    className={`rounded-lg px-3.5 py-2 text-sm font-medium transition-colors ${
+                      activeTab === tab
+                        ? "bg-slate/10 text-slate"
+                        : "text-mediumgray hover:bg-[#f1f5f9] hover:text-navy"
+                    }`}
+                  >
+                    {tab}
+                  </button>
+                ) : (
+                  <Link
+                    key={tab}
+                    href={TAB_LINKS[tab]}
+                    className="rounded-lg px-3.5 py-2 text-sm font-medium text-mediumgray transition-colors hover:bg-[#f1f5f9] hover:text-navy"
+                  >
+                    {tab}
+                  </Link>
+                ),
+              )}
             </div>
           </div>
         </div>
@@ -195,13 +320,13 @@ export default function ProfilePage() {
               <div className="relative mt-4 aspect-square w-full overflow-hidden rounded-2xl bg-[#f1f5f9]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={avatar}
+                  src={form.avatar}
                   alt="Selected avatar"
                   className="h-full w-full object-cover"
                 />
                 <button
                   type="button"
-                  onClick={() => setAvatar(avatarUrl("Felix"))}
+                  onClick={() => set("avatar", avatarUrl("Felix"))}
                   aria-label="Reset photo"
                   className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-navy/60 text-white backdrop-blur transition-colors hover:bg-navy/80"
                 >
@@ -235,12 +360,12 @@ export default function ProfilePage() {
                 <div className="grid grid-cols-5 gap-2">
                   {AVATAR_SEEDS.map((seed) => {
                     const url = avatarUrl(seed);
-                    const selected = avatar === url;
+                    const selected = form.avatar === url;
                     return (
                       <button
                         key={seed}
                         type="button"
-                        onClick={() => setAvatar(url)}
+                        onClick={() => set("avatar", url)}
                         aria-label={`Avatar ${seed}`}
                         className={`relative aspect-square overflow-hidden rounded-full bg-[#f1f5f9] transition-transform hover:scale-110 ${
                           selected
@@ -260,35 +385,27 @@ export default function ProfilePage() {
                   })}
                 </div>
               </div>
-
-              {/* Password */}
-              <div className="mt-6 space-y-4 border-t border-lightgray pt-5">
-                <Field label="Old Password" type="password" placeholder="••••••••" />
-                <Field label="New Password" type="password" placeholder="••••••••" />
-                <button
-                  type="button"
-                  className="w-full rounded-xl bg-navy py-3 text-sm font-semibold text-white transition-colors hover:bg-[#1f2937]"
-                >
-                  Change Password
-                </button>
-              </div>
             </div>
           </div>
 
           {/* Right: profile information */}
           <div className="lg:col-span-2">
-            <form className="space-y-8 rounded-2xl border border-lightgray bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+            <form
+              onSubmit={onSubmit}
+              className="space-y-8 rounded-2xl border border-lightgray bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
+            >
               {/* Profile information */}
               <div>
                 <SectionTitle>Profile Information</SectionTitle>
                 <div className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2">
-                  <Field label="Username" defaultValue="alex.kumar" />
-                  <Field label="First Name" defaultValue="Alex" />
-                  <Field label="Nickname" placeholder="Alex" />
+                  <Field label="Username" value={form.username} onChange={(v) => set("username", v)} />
+                  <Field label="First Name" value={form.firstName} onChange={(v) => set("firstName", v)} />
+                  <Field label="Nickname" value={form.nickname} onChange={(v) => set("nickname", v)} placeholder="What should we call you?" />
                   <label className="block">
                     <span className="mb-1.5 block text-sm font-medium text-navy">Role</span>
                     <select
-                      defaultValue="Student"
+                      value={form.displayRole}
+                      onChange={(e) => set("displayRole", e.target.value)}
                       className="h-11 w-full rounded-xl border border-lightgray bg-white px-3 text-sm text-navy outline-none transition-colors focus:border-slate focus:ring-2 focus:ring-slate/15"
                     >
                       <option>Student</option>
@@ -296,8 +413,9 @@ export default function ProfilePage() {
                       <option>Mentor</option>
                     </select>
                   </label>
-                  <Field label="Last Name" defaultValue="Kumar" />
-                  <Field label="Display Name Publicly as" defaultValue="Alex Kumar" />
+                  <Field label="Last Name" value={form.lastName} onChange={(v) => set("lastName", v)} />
+                  <Field label="Display Name Publicly as" value={form.displayName} onChange={(v) => set("displayName", v)} />
+                  <Field label="Target Role" value={form.targetRole} onChange={(v) => set("targetRole", v)} placeholder="Frontend Developer" />
                 </div>
               </div>
 
@@ -305,22 +423,28 @@ export default function ProfilePage() {
               <div>
                 <SectionTitle>Contact Info</SectionTitle>
                 <div className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2">
-                  <Field label="Email" type="email" defaultValue={student.email} required />
-                  <Field label="Website" placeholder="alex-kumar.dev" />
+                  <Field label="Email" type="email" value={profile.email} disabled required />
+                  <Field label="Phone" value={form.phone} onChange={(v) => set("phone", v)} placeholder="+91 98765 43210" />
+                  <Field label="Website" value={form.website} onChange={(v) => set("website", v)} placeholder="your-site.dev" />
+                  <Field label="Location" value={form.location} onChange={(v) => set("location", v)} placeholder="City, Country" />
                   <Field
                     label="LinkedIn"
                     type="url"
                     Icon={LinkedinIcon}
+                    value={form.linkedin}
+                    onChange={(v) => set("linkedin", v)}
                     placeholder="https://linkedin.com/in/your-profile"
                   />
                   <Field
                     label="GitHub"
                     type="url"
                     Icon={GithubIcon}
+                    value={form.github}
+                    onChange={(v) => set("github", v)}
                     placeholder="https://github.com/your-username"
                   />
-                  <Field label="WhatsApp" placeholder="@alex-kumar" />
-                  <Field label="Telegram" placeholder="@alex-kumar" />
+                  <Field label="WhatsApp" value={form.whatsapp} onChange={(v) => set("whatsapp", v)} placeholder="@your-handle" />
+                  <Field label="Telegram" value={form.telegram} onChange={(v) => set("telegram", v)} placeholder="@your-handle" />
                 </div>
               </div>
 
@@ -333,32 +457,48 @@ export default function ProfilePage() {
                   </span>
                   <textarea
                     rows={5}
-                    defaultValue="Aspiring frontend developer passionate about building delightful, accessible web experiences with React and TypeScript. Currently sharpening my skills and looking for my first full-time role."
+                    value={form.bio}
+                    onChange={(e) => set("bio", e.target.value)}
+                    placeholder="Tell employers a little about yourself — your focus, strengths and what you're looking for."
                     className="w-full resize-y rounded-xl border border-lightgray bg-white p-3.5 text-sm text-navy outline-none transition-colors placeholder:text-mediumgray focus:border-slate focus:ring-2 focus:ring-slate/15"
                   />
                 </label>
                 <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm text-mediumgray">
                   <span className="inline-flex items-center gap-1.5">
-                    <MapPin className="h-4 w-4" /> {student.location}
+                    <MapPin className="h-4 w-4" /> {form.location || "Add location"}
                   </span>
                   <span className="inline-flex items-center gap-1.5">
-                    <Globe className="h-4 w-4" /> alex-kumar.dev
+                    <Globe className="h-4 w-4" /> {form.website || "Add website"}
                   </span>
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 border-t border-lightgray pt-5">
+              <div className="flex items-center justify-end gap-3 border-t border-lightgray pt-5">
+                {status === "saved" && (
+                  <span className="mr-auto inline-flex items-center gap-1.5 text-sm font-medium text-emerald">
+                    <Check className="h-4 w-4" /> Saved
+                  </span>
+                )}
+                {status === "error" && (
+                  <span className="mr-auto text-sm font-medium text-orange">
+                    Couldn&apos;t save — try again.
+                  </span>
+                )}
                 <button
-                  type="reset"
-                  className="rounded-xl border border-lightgray px-5 py-2.5 text-sm font-semibold text-navy transition-colors hover:bg-[#f1f5f9]"
+                  type="button"
+                  onClick={onCancel}
+                  disabled={!dirty || status === "saving"}
+                  className="rounded-xl border border-lightgray px-5 py-2.5 text-sm font-semibold text-navy transition-colors hover:bg-[#f1f5f9] disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="rounded-xl bg-primary-gradient px-5 py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(59,130,246,0.25)] transition-transform hover:-translate-y-0.5"
+                  disabled={!dirty || status === "saving"}
+                  className="inline-flex items-center gap-2 rounded-xl bg-primary-gradient px-5 py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(59,130,246,0.25)] transition-transform hover:-translate-y-0.5 disabled:translate-y-0 disabled:opacity-60"
                 >
-                  Save Changes
+                  {status === "saving" && <Loader2 className="h-4 w-4 animate-spin" />}
+                  {status === "saving" ? "Saving…" : "Save Changes"}
                 </button>
               </div>
             </form>

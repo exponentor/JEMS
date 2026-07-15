@@ -7,21 +7,7 @@ import DashboardShell from "@/components/dashboard/student/DashboardShell";
 import PageHeader from "@/components/dashboard/student/PageHeader";
 import { Card } from "@/components/dashboard/student/ui";
 
-interface Job {
-  id: string;
-  role: string;
-  company: string;
-  match: number;
-  location: string;
-  salary: string;
-  saved: string;
-}
-
-const INITIAL: Job[] = [
-  { id: "s1", role: "Frontend Developer", company: "Stripe", match: 92, location: "Remote", salary: "$120k–150k", saved: "2d ago" },
-  { id: "s2", role: "Frontend Engineer", company: "Vercel", match: 90, location: "Remote", salary: "$110k–140k", saved: "3d ago" },
-  { id: "s3", role: "UI Engineer", company: "Razorpay", match: 81, location: "Hybrid", salary: "₹14–20 LPA", saved: "5d ago" },
-];
+import type { SavedJobView } from "@/lib/db/student-data";
 
 function matchTone(match: number) {
   if (match >= 90) return "bg-emerald/10 text-emerald";
@@ -29,8 +15,8 @@ function matchTone(match: number) {
   return "bg-gold/10 text-[#b45309]";
 }
 
-export default function SavedJobs() {
-  const [jobs, setJobs] = useState<Job[]>(INITIAL);
+export default function SavedJobs({ saved }: { saved: SavedJobView[] }) {
+  const [jobs, setJobs] = useState<SavedJobView[]>(saved);
   const remove = (id: string) => setJobs((j) => j.filter((x) => x.id !== id));
 
   return (

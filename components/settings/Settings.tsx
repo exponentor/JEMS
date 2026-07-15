@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { signOut } from "next-auth/react";
 import { Check } from "lucide-react";
 import DashboardShell from "@/components/dashboard/student/DashboardShell";
 import PageHeader from "@/components/dashboard/student/PageHeader";
 import { Card, Toggle } from "@/components/dashboard/student/ui";
-import { student } from "@/components/dashboard/student/data";
+import { useStudent } from "@/components/dashboard/student/StudentContext";
 
 const inputClass =
   "h-11 w-full rounded-lg border border-lightgray bg-white px-3 text-sm text-navy outline-none transition-colors placeholder:text-mediumgray focus:border-slate focus:ring-2 focus:ring-slate/15";
@@ -55,6 +56,7 @@ const NOTIFS = [
 ] as const;
 
 export default function Settings() {
+  const student = useStudent();
   const [fullName, setFullName] = useState(student.name);
   const [email, setEmail] = useState(student.email);
   const [title, setTitle] = useState(student.title);
@@ -69,10 +71,36 @@ export default function Settings() {
 
   const [remoteOnly, setRemoteOnly] = useState(true);
   const [saved, setSaved] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const save = () => {
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
+  };
+
+  const deleteAccount = async () => {
+    const confirmed = window.confirm(
+      "Permanently delete your account and all of your data? This cannot be undone.",
+    );
+    if (!confirmed) return;
+
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      const res = await fetch("/api/account", { method: "DELETE" });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as { error?: string };
+        setDeleteError(data.error ?? "Could not delete your account.");
+        setDeleting(false);
+        return;
+      }
+      // Account gone — drop the session and return to the landing page.
+      await signOut({ callbackUrl: "/" });
+    } catch {
+      setDeleteError("Network error. Please try again.");
+      setDeleting(false);
+    }
   };
 
   return (
@@ -158,11 +186,16 @@ export default function Settings() {
             </p>
             <button
               type="button"
-              className="shrink-0 self-start rounded-lg border border-[#EF4444] px-4 py-2 text-sm font-semibold text-[#EF4444] transition-colors hover:bg-[#fee2e2] sm:self-auto"
+              onClick={deleteAccount}
+              disabled={deleting}
+              className="shrink-0 self-start rounded-lg border border-[#EF4444] px-4 py-2 text-sm font-semibold text-[#EF4444] transition-colors hover:bg-[#fee2e2] disabled:opacity-60 sm:self-auto"
             >
-              Delete account
+              {deleting ? "Deleting…" : "Delete account"}
             </button>
           </div>
+          {deleteError && (
+            <p className="mt-3 text-xs font-medium text-[#EF4444]">{deleteError}</p>
+          )}
         </Card>
       </div>
     </DashboardShell>

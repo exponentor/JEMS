@@ -35,6 +35,7 @@ async function setupDatabase() {
       'activityLogs',
       'notifications',
       'feedback',
+      'passwordResets',
     ];
 
     console.log('\n✓ Creating collections...');
@@ -99,6 +100,11 @@ async function setupDatabase() {
 
     await db.collection('notifications').createIndex({ userId: 1 });
     console.log('  ✓ notifications');
+
+    await db.collection('passwordResets').createIndex({ email: 1 }, { unique: true });
+    // TTL cleanup: Mongo drops the doc once expiresAt (OTP or, once verified, reset-token expiry) is in the past.
+    await db.collection('passwordResets').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+    console.log('  ✓ passwordResets');
 
     console.log('\n✓✓✓ Database setup complete! ✓✓✓');
 

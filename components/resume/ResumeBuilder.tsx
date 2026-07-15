@@ -4,13 +4,12 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Check, Download, FilePlus2, Loader2, Menu, Trash2 } from "lucide-react";
 import Sidebar from "@/components/dashboard/student/Sidebar";
-import { student } from "@/components/dashboard/student/data";
+import { useStudent } from "@/components/dashboard/student/StudentContext";
 import ResumeEditor from "./ResumeEditor";
 import ResumePreview from "./ResumePreview";
 import {
   atsScore,
   emptyResume,
-  INITIAL_RESUME,
   type ResumeData,
   type ResumeVersion,
   uid,
@@ -26,13 +25,16 @@ function timeAgo(ts: number): string {
   return `${h}h ago`;
 }
 
-export default function ResumeBuilder() {
+export default function ResumeBuilder({
+  initialVersions,
+}: {
+  initialVersions: ResumeVersion[];
+}) {
+  const student = useStudent();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const [versions, setVersions] = useState<ResumeVersion[]>(() => [
-    { id: "v1", name: "Resume v1", data: INITIAL_RESUME },
-  ]);
-  const [activeId, setActiveId] = useState("v1");
+  const [versions, setVersions] = useState<ResumeVersion[]>(initialVersions);
+  const [activeId, setActiveId] = useState(initialVersions[0]?.id ?? "v1");
 
   const active = versions.find((v) => v.id === activeId) ?? versions[0];
   const data = active.data;
@@ -57,24 +59,37 @@ export default function ResumeBuilder() {
   const renameVersion = (name: string) =>
     setVersions((vs) => vs.map((v) => (v.id === active.id ? { ...v, name } : v)));
 
-  // ── Auto-save (simulated) ───────────────────────────────────
+  // ── Auto-save (persists to MongoDB) ─────────────────────────
   const [saving, setSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState(() => Date.now());
   const [, tick] = useState(0);
   const firstRun = useRef(true);
 
   useEffect(() => {
+    // Skip the very first render so loading a resume doesn't trigger a save.
     if (firstRun.current) {
       firstRun.current = false;
       return;
     }
     setSaving(true);
-    const t = setTimeout(() => {
-      setSaving(false);
-      setLastSaved(Date.now());
+    const t = setTimeout(async () => {
+      try {
+        await fetch("/api/student/resume", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            versions,
+            atsScore: atsScore(active.data).score,
+          }),
+        });
+        setLastSaved(Date.now());
+      } finally {
+        setSaving(false);
+      }
     }, 900);
     return () => clearTimeout(t);
-  }, [data]);
+    // Re-save whenever any version's content or names change.
+  }, [versions, active.data]);
 
   // Refresh the "x min ago" label periodically.
   useEffect(() => {

@@ -16,6 +16,8 @@ export interface HeroProps {
   onNavigate?: (href: string) => void;
   onStartLearning?: () => void;
   onForCompanies?: () => void;
+  /** Sends an authenticated student straight to their dashboard. */
+  onGoToDashboard?: () => void;
 }
 
 /**
@@ -34,6 +36,7 @@ export default function Hero({
   onNavigate,
   onStartLearning,
   onForCompanies,
+  onGoToDashboard,
 }: HeroProps) {
   return (
     <div className="pt-15">
@@ -54,6 +57,7 @@ export default function Hero({
           readinessPercentage={readinessPercentage}
           studentMetrics={studentMetrics}
           onNavigate={onNavigate}
+          onGoToDashboard={onGoToDashboard}
         />
       )}
     </div>

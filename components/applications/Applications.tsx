@@ -1,29 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { Briefcase } from "lucide-react";
 import DashboardShell from "@/components/dashboard/student/DashboardShell";
 import PageHeader from "@/components/dashboard/student/PageHeader";
-import { Card } from "@/components/dashboard/student/ui";
+import { Card, EmptyState } from "@/components/dashboard/student/ui";
+import type { ApplicationView } from "@/lib/db/student-data";
 
 const STAGES = ["Applied", "In review", "Interview", "Offer"] as const;
-type Stage = (typeof STAGES)[number];
-type Status = Stage | "Rejected";
-
-interface Application {
-  id: string;
-  role: string;
-  company: string;
-  applied: string;
-  status: Status;
-}
-
-const APPS: Application[] = [
-  { id: "a1", role: "Frontend Developer", company: "Stripe", applied: "Jun 22", status: "Interview" },
-  { id: "a2", role: "React Engineer", company: "Airbnb", applied: "Jun 20", status: "In review" },
-  { id: "a3", role: "UI Engineer", company: "Razorpay", applied: "Jun 18", status: "Offer" },
-  { id: "a4", role: "Frontend Engineer", company: "Vercel", applied: "Jun 15", status: "Applied" },
-  { id: "a5", role: "Software Engineer I", company: "Swiggy", applied: "Jun 10", status: "Rejected" },
-];
+type Status = ApplicationView["status"];
 
 function statusTone(s: Status) {
   if (s === "Offer") return "bg-emerald/10 text-emerald";
@@ -34,17 +19,34 @@ function statusTone(s: Status) {
 
 const TABS = ["All", "Applied", "In review", "Interview", "Offer", "Rejected"] as const;
 
-export default function Applications() {
+export default function Applications({ apps }: { apps: ApplicationView[] }) {
   const [tab, setTab] = useState<(typeof TABS)[number]>("All");
 
   const counts = {
-    Applied: APPS.filter((a) => a.status === "Applied").length,
-    "In review": APPS.filter((a) => a.status === "In review").length,
-    Interview: APPS.filter((a) => a.status === "Interview").length,
-    Offer: APPS.filter((a) => a.status === "Offer").length,
+    Applied: apps.filter((a) => a.status === "Applied").length,
+    "In review": apps.filter((a) => a.status === "In review").length,
+    Interview: apps.filter((a) => a.status === "Interview").length,
+    Offer: apps.filter((a) => a.status === "Offer").length,
   };
 
-  const visible = APPS.filter((a) => tab === "All" || a.status === tab);
+  const visible = apps.filter((a) => tab === "All" || a.status === tab);
+
+  if (apps.length === 0) {
+    return (
+      <DashboardShell>
+        <div className="mx-auto max-w-6xl space-y-6">
+          <PageHeader title="Applications" crumb="Applications" />
+          <EmptyState
+            icon={Briefcase}
+            title="No applications yet"
+            hint="When you apply to roles from Job Matches, they'll show up here so you can track every stage from applied to offer."
+            ctaLabel="Browse Job Matches"
+            ctaHref="/student/jobs"
+          />
+        </div>
+      </DashboardShell>
+    );
+  }
 
   return (
     <DashboardShell>

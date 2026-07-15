@@ -8,6 +8,8 @@ interface StudentHeroProps {
   readinessPercentage?: number;
   studentMetrics?: StudentMetrics;
   onNavigate?: (href: string) => void;
+  /** Opens the full student dashboard. */
+  onGoToDashboard?: () => void;
 }
 
 interface ActionCard {
@@ -26,6 +28,7 @@ export default function StudentHero({
   readinessPercentage = 45,
   studentMetrics,
   onNavigate,
+  onGoToDashboard,
 }: StudentHeroProps) {
   const m: Required<StudentMetrics> = {
     resumeStepsComplete: studentMetrics?.resumeStepsComplete ?? 2,
@@ -77,6 +80,14 @@ export default function StudentHero({
               </span>{" "}
               of the way to job-ready
             </p>
+            <button
+              type="button"
+              onClick={onGoToDashboard}
+              className="mt-5 inline-flex items-center gap-2 rounded-full bg-cta-gradient px-6 py-3 text-sm font-semibold text-white shadow-[var(--shadow-cta)] transition-transform hover:scale-[1.03]"
+            >
+              Go to Dashboard
+              <span aria-hidden="true">→</span>
+            </button>
           </div>
           <ProgressRing percentage={readinessPercentage} />
         </div>

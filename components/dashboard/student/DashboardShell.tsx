@@ -1,10 +1,10 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { signOut } from "next-auth/react";
 import { useState } from "react";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
-import { student } from "./data";
+import { useStudent } from "./StudentContext";
 
 /**
  * Shared chrome for every student dashboard screen: the Constructor-X style
@@ -15,7 +15,7 @@ export default function DashboardShell({
 }: {
   children: React.ReactNode;
 }) {
-  const router = useRouter();
+  const student = useStudent();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
@@ -32,7 +32,7 @@ export default function DashboardShell({
           name={student.name}
           email={student.email}
           onMenu={() => setSidebarOpen(true)}
-          onLogout={() => router.push("/")}
+          onLogout={() => signOut({ callbackUrl: "/" })}
         />
 
         <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">{children}</main>

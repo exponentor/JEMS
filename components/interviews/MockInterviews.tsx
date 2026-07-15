@@ -12,13 +12,7 @@ import {
 import DashboardShell from "@/components/dashboard/student/DashboardShell";
 import PageHeader from "@/components/dashboard/student/PageHeader";
 import { Card } from "@/components/dashboard/student/ui";
-
-const STATS = [
-  { label: "Completed", value: "12" },
-  { label: "Average score", value: "74%" },
-  { label: "Best score", value: "88%" },
-  { label: "Current streak", value: "3 days" },
-];
+import type { MockInterviewData } from "@/lib/db/student-data";
 
 interface InterviewType {
   title: string;
@@ -34,26 +28,20 @@ const TYPES: InterviewType[] = [
   { title: "Role-specific", desc: "Tailored to your target role", duration: "30 min", icon: Target },
 ];
 
-interface PastInterview {
-  date: string;
-  type: string;
-  score: number;
-}
-
-const PAST: PastInterview[] = [
-  { date: "Jun 24", type: "Behavioral", score: 78 },
-  { date: "Jun 20", type: "Technical Coding", score: 65 },
-  { date: "Jun 15", type: "System Design", score: 74 },
-  { date: "Jun 10", type: "Role-specific", score: 81 },
-];
-
 function scoreTone(score: number) {
   if (score >= 80) return "bg-emerald/10 text-emerald";
   if (score >= 70) return "bg-slate/10 text-slate";
   return "bg-gold/10 text-[#b45309]";
 }
 
-export default function MockInterviews() {
+export default function MockInterviews({ data }: { data: MockInterviewData }) {
+  const STATS = [
+    { label: "Completed", value: String(data.completed) },
+    { label: "Average score", value: data.completed ? `${data.average}%` : "—" },
+    { label: "Best score", value: data.completed ? `${data.best}%` : "—" },
+    { label: "Current streak", value: data.streak ? `${data.streak} days` : "—" },
+  ];
+
   return (
     <DashboardShell>
       <div className="mx-auto max-w-6xl space-y-6">
@@ -66,7 +54,7 @@ export default function MockInterviews() {
               <p className="text-xs font-medium text-mediumgray">{s.label}</p>
               <p className="mt-2 inline-flex items-center gap-1.5 text-2xl font-bold text-navy">
                 {s.value}
-                {i === 1 && <TrendingUp className="h-4 w-4 text-emerald" />}
+                {i === 1 && data.completed > 0 && <TrendingUp className="h-4 w-4 text-emerald" />}
               </p>
             </Card>
           ))}
@@ -110,22 +98,29 @@ export default function MockInterviews() {
               View all
             </button>
           </div>
-          <ul className="divide-y divide-lightgray">
-            {PAST.map((p) => (
-              <li key={`${p.date}-${p.type}`} className="flex items-center gap-4 px-5 py-3.5">
-                <span className={`flex h-9 w-12 items-center justify-center rounded-lg text-sm font-bold ${scoreTone(p.score)}`}>
-                  {p.score}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-navy">{p.type}</p>
-                  <p className="text-xs text-mediumgray">{p.date} · 2026</p>
-                </div>
-                <button type="button" className="shrink-0 rounded-lg border border-lightgray px-3.5 py-2 text-xs font-semibold text-navy transition-colors hover:border-slate hover:text-slate">
-                  View feedback
-                </button>
-              </li>
-            ))}
-          </ul>
+          {data.past.length === 0 ? (
+            <p className="px-5 py-10 text-center text-sm text-mediumgray">
+              You haven&apos;t taken any mock interviews yet. Pick a type above to
+              run your first one and get instant AI feedback.
+            </p>
+          ) : (
+            <ul className="divide-y divide-lightgray">
+              {data.past.map((p) => (
+                <li key={p.id} className="flex items-center gap-4 px-5 py-3.5">
+                  <span className={`flex h-9 w-12 items-center justify-center rounded-lg text-sm font-bold ${scoreTone(p.score)}`}>
+                    {p.score}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold text-navy">{p.type}</p>
+                    <p className="text-xs text-mediumgray">{p.date}</p>
+                  </div>
+                  <button type="button" className="shrink-0 rounded-lg border border-lightgray px-3.5 py-2 text-xs font-semibold text-navy transition-colors hover:border-slate hover:text-slate">
+                    View feedback
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </Card>
       </div>
     </DashboardShell>

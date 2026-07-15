@@ -1,4 +1,5 @@
-import type { ReactNode } from "react";
+import type { ComponentType, ReactNode } from "react";
+import Link from "next/link";
 
 /** Standard dashboard surface — soft border + subtle shadow, no gradients. */
 export function Card({
@@ -36,6 +37,43 @@ export function ProgressBar({
 
 export function SectionTitle({ children }: { children: ReactNode }) {
   return <h2 className="text-sm font-semibold text-navy">{children}</h2>;
+}
+
+/**
+ * Friendly empty state shown when a student hasn't worked on a section yet —
+ * an icon, a short headline, a hint and a call-to-action that points them to
+ * the place where they can "add this" to get started.
+ */
+export function EmptyState({
+  icon: Icon,
+  title,
+  hint,
+  ctaLabel,
+  ctaHref,
+}: {
+  icon: ComponentType<{ className?: string }>;
+  title: string;
+  hint: string;
+  ctaLabel?: string;
+  ctaHref?: string;
+}) {
+  return (
+    <Card className="flex flex-col items-center justify-center px-6 py-16 text-center">
+      <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate/10 text-slate">
+        <Icon className="h-7 w-7" />
+      </span>
+      <p className="mt-4 text-base font-semibold text-navy">{title}</p>
+      <p className="mt-1 max-w-sm text-sm text-mediumgray">{hint}</p>
+      {ctaLabel && ctaHref && (
+        <Link
+          href={ctaHref}
+          className="mt-5 inline-flex items-center justify-center rounded-lg bg-primary-gradient px-5 py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(59,130,246,0.25)] transition-transform hover:-translate-y-0.5"
+        >
+          {ctaLabel}
+        </Link>
+      )}
+    </Card>
+  );
 }
 
 /** Controlled switch used in Settings / notifications. */

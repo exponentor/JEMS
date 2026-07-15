@@ -14,30 +14,22 @@ import {
 } from "lucide-react";
 import DashboardShell from "@/components/dashboard/student/DashboardShell";
 import PageHeader from "@/components/dashboard/student/PageHeader";
-import { Card, ProgressBar } from "@/components/dashboard/student/ui";
+import { Card, EmptyState, ProgressBar } from "@/components/dashboard/student/ui";
+import type { LearningPathView, LearningStatus } from "@/lib/db/student-data";
 
-type Status = "in-progress" | "recommended" | "completed";
+type Status = LearningStatus;
 
-interface Path {
-  id: string;
-  title: string;
-  category: string;
-  level: string;
-  lessons: number;
-  hours: number;
-  progress: number;
-  status: Status;
-  icon: LucideIcon;
-}
-
-const PATHS: Path[] = [
-  { id: "p1", title: "Frontend Developer", category: "Web Development", level: "Intermediate", lessons: 42, hours: 28, progress: 45, status: "in-progress", icon: Layers },
-  { id: "p2", title: "React Mastery", category: "Frameworks", level: "Advanced", lessons: 36, hours: 22, progress: 70, status: "in-progress", icon: Boxes },
-  { id: "p3", title: "TypeScript Essentials", category: "Languages", level: "Beginner", lessons: 24, hours: 14, progress: 0, status: "recommended", icon: Braces },
-  { id: "p4", title: "System Design Basics", category: "Architecture", level: "Advanced", lessons: 18, hours: 16, progress: 0, status: "recommended", icon: Network },
-  { id: "p5", title: "Data Structures & Algorithms", category: "Fundamentals", level: "Intermediate", lessons: 48, hours: 40, progress: 100, status: "completed", icon: Code2 },
-  { id: "p6", title: "CSS & Tailwind", category: "Styling", level: "Beginner", lessons: 20, hours: 10, progress: 100, status: "completed", icon: Sparkles },
-];
+/** Maps a stored path category to a glyph (icons can't be serialized from DB). */
+const CATEGORY_ICONS: Record<string, LucideIcon> = {
+  "Web Development": Layers,
+  Frameworks: Boxes,
+  Languages: Braces,
+  Architecture: Network,
+  Fundamentals: Code2,
+  Styling: Sparkles,
+};
+const iconFor = (category: string): LucideIcon =>
+  CATEGORY_ICONS[category] ?? Layers;
 
 const FILTERS: { key: "all" | Status; label: string }[] = [
   { key: "all", label: "All" },
@@ -52,10 +44,30 @@ function ctaLabel(p: number) {
   return "Start";
 }
 
-export default function LearningPaths() {
+export default function LearningPaths({ paths }: { paths: LearningPathView[] }) {
   const [filter, setFilter] = useState<"all" | Status>("all");
-  const visible = PATHS.filter((p) => filter === "all" || p.status === filter);
-  const featured = PATHS[0];
+  const visible = paths.filter((p) => filter === "all" || p.status === filter);
+  // Feature the path the student is furthest along but hasn't finished.
+  const featured =
+    paths.find((p) => p.status === "in-progress") ??
+    paths.find((p) => p.status === "recommended");
+
+  if (paths.length === 0) {
+    return (
+      <DashboardShell>
+        <div className="mx-auto max-w-6xl space-y-6">
+          <PageHeader title="Learning Paths" crumb="Learning Paths" />
+          <EmptyState
+            icon={Layers}
+            title="No learning paths yet"
+            hint="Tell us your target role and we'll recommend a structured learning path to close your skill gaps. Your enrolled paths will live here."
+            ctaLabel="Set your target role"
+            ctaHref="/student/profile"
+          />
+        </div>
+      </DashboardShell>
+    );
+  }
 
   return (
     <DashboardShell>
@@ -63,32 +75,34 @@ export default function LearningPaths() {
         <PageHeader title="Learning Paths" crumb="Learning Paths" />
 
         {/* Continue learning */}
-        <Card className="overflow-hidden">
-          <div className="flex flex-col gap-5 p-6 sm:flex-row sm:items-center sm:justify-between">
-            <div className="min-w-0">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-slate/10 px-2.5 py-1 text-xs font-semibold text-slate">
-                <Play className="h-3.5 w-3.5" /> Continue learning
-              </span>
-              <h2 className="mt-3 text-lg font-bold text-navy">{featured.title} Path</h2>
-              <p className="mt-1 text-sm text-mediumgray">
-                Next: “Building accessible forms” · Lesson 19 of {featured.lessons}
-              </p>
-              <div className="mt-4 max-w-md">
-                <div className="mb-1 flex justify-between text-xs text-mediumgray">
-                  <span>{featured.progress}% complete</span>
-                  <span>{featured.lessons - Math.round((featured.progress / 100) * featured.lessons)} lessons left</span>
+        {featured && (
+          <Card className="overflow-hidden">
+            <div className="flex flex-col gap-5 p-6 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-slate/10 px-2.5 py-1 text-xs font-semibold text-slate">
+                  <Play className="h-3.5 w-3.5" /> Continue learning
+                </span>
+                <h2 className="mt-3 text-lg font-bold text-navy">{featured.title} Path</h2>
+                <p className="mt-1 text-sm text-mediumgray">
+                  {featured.category} · {featured.lessons} lessons
+                </p>
+                <div className="mt-4 max-w-md">
+                  <div className="mb-1 flex justify-between text-xs text-mediumgray">
+                    <span>{featured.progress}% complete</span>
+                    <span>{featured.lessons - Math.round((featured.progress / 100) * featured.lessons)} lessons left</span>
+                  </div>
+                  <ProgressBar value={featured.progress} />
                 </div>
-                <ProgressBar value={featured.progress} />
               </div>
+              <button
+                type="button"
+                className="shrink-0 self-start rounded-lg bg-primary-gradient px-5 py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(59,130,246,0.25)] transition-transform hover:-translate-y-0.5 sm:self-auto"
+              >
+                {featured.progress > 0 ? "Resume path" : "Start path"}
+              </button>
             </div>
-            <button
-              type="button"
-              className="shrink-0 self-start rounded-lg bg-primary-gradient px-5 py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(59,130,246,0.25)] transition-transform hover:-translate-y-0.5 sm:self-auto"
-            >
-              Resume path
-            </button>
-          </div>
-        </Card>
+          </Card>
+        )}
 
         {/* Filters */}
         <div className="flex flex-wrap gap-2">
@@ -111,7 +125,7 @@ export default function LearningPaths() {
         {/* Paths grid */}
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
           {visible.map((p) => {
-            const Icon = p.icon;
+            const Icon = iconFor(p.category);
             const done = p.progress >= 100;
             return (
               <Card key={p.id} className="flex flex-col p-5">

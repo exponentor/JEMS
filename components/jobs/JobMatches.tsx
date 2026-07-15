@@ -1,31 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Bookmark, BookmarkCheck, MapPin, Search } from "lucide-react";
+import { Bookmark, BookmarkCheck, MapPin, Search, Target } from "lucide-react";
 import DashboardShell from "@/components/dashboard/student/DashboardShell";
 import PageHeader from "@/components/dashboard/student/PageHeader";
-import { Card } from "@/components/dashboard/student/ui";
-
-interface Job {
-  id: string;
-  role: string;
-  company: string;
-  match: number;
-  location: string;
-  type: string;
-  salary: string;
-  posted: string;
-  remote: boolean;
-}
-
-const JOBS: Job[] = [
-  { id: "j1", role: "Frontend Developer", company: "Stripe", match: 92, location: "Remote", type: "Full-time", salary: "$120k–150k", posted: "2d ago", remote: true },
-  { id: "j2", role: "React Engineer", company: "Airbnb", match: 88, location: "Bengaluru", type: "Full-time", salary: "₹18–24 LPA", posted: "4d ago", remote: false },
-  { id: "j3", role: "UI Engineer", company: "Razorpay", match: 81, location: "Hybrid", type: "Full-time", salary: "₹14–20 LPA", posted: "1w ago", remote: true },
-  { id: "j4", role: "Junior Web Developer", company: "Zoho", match: 76, location: "Chennai", type: "Full-time", salary: "₹8–12 LPA", posted: "1w ago", remote: false },
-  { id: "j5", role: "Frontend Engineer", company: "Vercel", match: 90, location: "Remote", type: "Full-time", salary: "$110k–140k", posted: "3d ago", remote: true },
-  { id: "j6", role: "Software Engineer I", company: "Swiggy", match: 79, location: "Bengaluru", type: "Full-time", salary: "₹16–22 LPA", posted: "5d ago", remote: false },
-];
+import { Card, EmptyState } from "@/components/dashboard/student/ui";
+import type { JobMatchView } from "@/lib/db/student-data";
 
 function matchTone(match: number) {
   if (match >= 90) return "bg-emerald/10 text-emerald";
@@ -41,9 +21,15 @@ const FILTERS = [
 
 type FilterKey = (typeof FILTERS)[number]["key"];
 
-export default function JobMatches() {
+export default function JobMatches({
+  jobs,
+  initialSaved,
+}: {
+  jobs: JobMatchView[];
+  initialSaved: string[];
+}) {
   const [filter, setFilter] = useState<FilterKey>("all");
-  const [saved, setSaved] = useState<Set<string>>(new Set());
+  const [saved, setSaved] = useState<Set<string>>(() => new Set(initialSaved));
 
   const toggleSave = (id: string) =>
     setSaved((prev) => {
@@ -53,9 +39,26 @@ export default function JobMatches() {
       return next;
     });
 
-  const visible = JOBS.filter((j) =>
+  const visible = jobs.filter((j) =>
     filter === "remote" ? j.remote : filter === "top" ? j.match >= 90 : true,
   );
+
+  if (jobs.length === 0) {
+    return (
+      <DashboardShell>
+        <div className="mx-auto max-w-6xl space-y-6">
+          <PageHeader title="Job Matches" crumb="Job Matches" />
+          <EmptyState
+            icon={Target}
+            title="No job matches yet"
+            hint="Complete your resume and add your skills so we can match you with roles that fit. Your best matches will appear here."
+            ctaLabel="Build your resume"
+            ctaHref="/student/resume"
+          />
+        </div>
+      </DashboardShell>
+    );
+  }
 
   return (
     <DashboardShell>

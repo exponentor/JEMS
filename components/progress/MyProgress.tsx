@@ -4,37 +4,30 @@ import { Award, BookOpen, Flame, Mic, Trophy } from "lucide-react";
 import DashboardShell from "@/components/dashboard/student/DashboardShell";
 import PageHeader from "@/components/dashboard/student/PageHeader";
 import { Card, ProgressBar } from "@/components/dashboard/student/ui";
-import { skills, student } from "@/components/dashboard/student/data";
+import type { ProgressData } from "@/lib/db/student-data";
 
-const TILES = [
-  { label: "Lessons completed", value: "24", icon: BookOpen },
-  { label: "Mock interviews", value: "12", icon: Mic },
-  { label: "Day streak", value: "3", icon: Flame },
-  { label: "Badges earned", value: "5", icon: Award },
-];
+const DAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
 
-const WEEK = [
-  { day: "M", v: 40 },
-  { day: "T", v: 70 },
-  { day: "W", v: 55 },
-  { day: "T", v: 90 },
-  { day: "F", v: 65 },
-  { day: "S", v: 30 },
-  { day: "S", v: 50 },
-];
+export default function MyProgress({ data }: { data: ProgressData }) {
+  const TILES = [
+    { label: "Lessons completed", value: String(data.lessonsCompleted), icon: BookOpen },
+    { label: "Mock interviews", value: String(data.mockInterviews), icon: Mic },
+    { label: "Day streak", value: String(data.streak), icon: Flame },
+    { label: "Badges earned", value: String(data.badges), icon: Award },
+  ];
+  const week =
+    data.week.length === 7
+      ? data.week
+      : DAY_LABELS.map((day) => ({ day, v: 0 }));
+  const { skills, achievements } = data;
 
-const ACHIEVEMENTS = [
-  { title: "First Resume", earned: true },
-  { title: "5 Interviews", earned: true },
-  { title: "Skill Master", earned: true },
-  { title: "3-Day Streak", earned: true },
-  { title: "First Application", earned: true },
-  { title: "10 Interviews", earned: false },
-  { title: "Job Offer", earned: false },
-  { title: "Path Complete", earned: false },
-];
+  const readinessNote =
+    data.readiness >= 70
+      ? "You're interview-ready — keep the momentum."
+      : data.readiness > 0
+        ? "Keep going — you're on track."
+        : "Complete your resume and skills to start building readiness.";
 
-export default function MyProgress() {
   return (
     <DashboardShell>
       <div className="mx-auto max-w-6xl space-y-6">
@@ -45,12 +38,12 @@ export default function MyProgress() {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-sm font-semibold text-navy">Overall job readiness</h2>
-              <p className="mt-1 text-xs text-mediumgray">Keep going — you&apos;re on track.</p>
+              <p className="mt-1 text-xs text-mediumgray">{readinessNote}</p>
             </div>
-            <span className="text-2xl font-bold text-slate">{student.readiness}%</span>
+            <span className="text-2xl font-bold text-slate">{data.readiness}%</span>
           </div>
           <div className="mt-4">
-            <ProgressBar value={student.readiness} />
+            <ProgressBar value={data.readiness} />
           </div>
         </Card>
 
@@ -75,7 +68,7 @@ export default function MyProgress() {
           <Card className="p-6">
             <h2 className="text-sm font-semibold text-navy">This week&apos;s activity</h2>
             <div className="mt-5 flex h-40 items-end justify-between gap-3">
-              {WEEK.map((d, i) => (
+              {week.map((d, i) => (
                 <div key={i} className="flex flex-1 flex-col items-center gap-2">
                   <div className="flex w-full flex-1 items-end">
                     <div
@@ -92,17 +85,23 @@ export default function MyProgress() {
           {/* Skills */}
           <Card className="p-6">
             <h2 className="text-sm font-semibold text-navy">Skill proficiency</h2>
-            <ul className="mt-4 space-y-3.5">
-              {skills.map((s) => (
-                <li key={s.name}>
-                  <div className="mb-1 flex justify-between text-xs">
-                    <span className="font-medium text-navy">{s.name}</span>
-                    <span className="text-mediumgray">{s.level}%</span>
-                  </div>
-                  <ProgressBar value={s.level} barClass="bg-navy" />
-                </li>
-              ))}
-            </ul>
+            {skills.length === 0 ? (
+              <p className="mt-4 text-sm text-mediumgray">
+                Add skills to your resume to track how your proficiency grows over time.
+              </p>
+            ) : (
+              <ul className="mt-4 space-y-3.5">
+                {skills.map((s) => (
+                  <li key={s.name}>
+                    <div className="mb-1 flex justify-between text-xs">
+                      <span className="font-medium text-navy">{s.name}</span>
+                      <span className="text-mediumgray">{s.level}%</span>
+                    </div>
+                    <ProgressBar value={s.level} barClass="bg-navy" />
+                  </li>
+                ))}
+              </ul>
+            )}
           </Card>
         </div>
 
@@ -113,7 +112,7 @@ export default function MyProgress() {
             <h2 className="text-sm font-semibold text-navy">Achievements</h2>
           </div>
           <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
-            {ACHIEVEMENTS.map((a) => (
+            {achievements.map((a) => (
               <div
                 key={a.title}
                 className={`flex flex-col items-center rounded-xl border p-4 text-center ${

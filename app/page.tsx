@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Hero } from "@/components/Hero";
 import { Navbar } from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -14,12 +16,17 @@ import SocialProof from "@/components/sections/SocialProof";
 
 export default function Home() {
   const router = useRouter();
+  const { status } = useSession();
 
-  // Every "get started" / auth entry point funnels through the login page,
-  // which redirects to the right dashboard for the demo account used.
+  // The landing page is for visitors only — a signed-in student belongs on
+  // their dashboard, so send them straight there.
+  useEffect(() => {
+    if (status === "authenticated") router.replace("/student/dashboard");
+  }, [status, router]);
+
   const goLogin = () => router.push("/login");
 
-  // Scroll-based navigation for the landing page anchors.
+  // Scroll-based navigation for the landing-page anchors.
   const handleNavigate = (href: string) => {
     if (typeof window === "undefined") return;
     if (href === "/" || href === "#home" || href === "#top") {
@@ -32,6 +39,9 @@ export default function Home() {
         ?.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
+
+  // Don't flash the marketing page while we redirect an authenticated user.
+  if (status === "authenticated") return null;
 
   return (
     <>

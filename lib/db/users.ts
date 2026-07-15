@@ -32,10 +32,30 @@ async function users() {
 }
 
 export async function getUserByEmail(email: string): Promise<UserDoc | null> {
+  // Coerce to a primitive string so a non-string value (e.g. a `{ $ne: null }`
+  // operator object) can never be passed through into the query — NoSQL
+  // injection guard / defence in depth.
+  const normalized = String(email ?? "").toLowerCase().trim();
+  if (!normalized) return null;
   const col = await users();
-  return (await col.findOne({ email: email.toLowerCase().trim() })) as
-    | UserDoc
-    | null;
+  return (await col.findOne({ email: normalized })) as UserDoc | null;
+}
+
+/** Looks up a user by their string id. Returns null for missing/invalid ids. */
+export async function getUserById(id: string): Promise<UserDoc | null> {
+  if (!ObjectId.isValid(id)) return null;
+  const col = await users();
+  return (await col.findOne({ _id: new ObjectId(id) })) as UserDoc | null;
+}
+
+/** Permanently removes a user and their associated studentProfiles doc. */
+export async function deleteUserById(id: string): Promise<boolean> {
+  if (!ObjectId.isValid(id)) return false;
+  const db = await getDatabase();
+  const _id = new ObjectId(id);
+  const res = await db.collection("users").deleteOne({ _id });
+  await db.collection("studentProfiles").deleteOne({ userId: _id });
+  return res.deletedCount === 1;
 }
 
 interface CreateStudentArgs {
