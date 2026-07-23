@@ -55,8 +55,8 @@ export default function ProgressRing({
         />
         <defs>
           <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#3b82f6" />
-            <stop offset="100%" stopColor="#2563eb" />
+            <stop offset="0%" stopColor="#f97316" />
+            <stop offset="100%" stopColor="#c2410c" />
           </linearGradient>
         </defs>
       </svg>

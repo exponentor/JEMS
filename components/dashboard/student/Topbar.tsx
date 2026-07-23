@@ -1,41 +1,33 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import {
   Bell,
-  ChevronLeft,
   HelpCircle,
+  Home,
   LogOut,
   Menu,
   Search,
-  Settings,
   Sparkles,
   User,
   X,
 } from "lucide-react";
+import { crumbForPath } from "./nav-items";
+import { useOpenMobileSidebar } from "./sidebar-context";
+import { useStudent } from "./StudentContext";
 
-interface TopbarProps {
-  name: string;
-  email: string;
-  onMenu: () => void;
-  onLogout: () => void;
-}
+export default function Topbar() {
+  const student = useStudent();
+  const pathname = usePathname();
+  const openMobileSidebar = useOpenMobileSidebar();
+  const crumb = crumbForPath(pathname);
 
-const NAV = [
-  { label: "Dashboard", href: "/student/dashboard" },
-  { label: "Profile", href: "/student/profile" },
-  { label: "Resume", href: "/student/resume" },
-  { label: "Support", href: "/student/support" },
-];
-
-export default function Topbar({ name, email, onMenu, onLogout }: TopbarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const router = useRouter();
-  const pathname = usePathname();
-  const initial = name.trim().charAt(0).toUpperCase() || "U";
+  const initial = student.name.trim().charAt(0).toUpperCase() || "U";
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -51,45 +43,32 @@ export default function Topbar({ name, email, onMenu, onLogout }: TopbarProps) {
     };
   }, [menuOpen]);
 
+  const onLogout = () => signOut({ callbackUrl: "/" });
+
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-lightgray bg-white px-4 sm:px-6">
       <button
         type="button"
-        onClick={onMenu}
+        onClick={openMobileSidebar}
         aria-label="Open menu"
         className="flex h-9 w-9 items-center justify-center rounded-lg text-navy transition-colors hover:bg-[#f1f5f9] lg:hidden"
       >
         <Menu className="h-5 w-5" />
       </button>
 
-      {/* Back */}
-      <button
-        type="button"
-        onClick={() => router.back()}
-        aria-label="Go back"
-        className="hidden h-9 w-9 items-center justify-center rounded-full border border-lightgray text-navy transition-colors hover:bg-[#f1f5f9] lg:flex"
-      >
-        <ChevronLeft className="h-4 w-4" />
-      </button>
-
-      {/* Center nav */}
-      <nav className="hidden items-center gap-1 lg:flex">
-        {NAV.map((item) => {
-          const active = pathname === item.href;
-          return (
-            <Link
-              key={item.label}
-              href={item.href}
-              className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                active
-                  ? "text-navy"
-                  : "text-mediumgray hover:bg-[#f1f5f9] hover:text-navy"
-              }`}
-            >
-              {item.label}
-            </Link>
-          );
-        })}
+      {/* Breadcrumb */}
+      <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-sm text-mediumgray">
+        <Link
+          href="/student/dashboard"
+          aria-label="Dashboard"
+          className="transition-colors hover:text-navy"
+        >
+          <Home className="h-4 w-4" />
+        </Link>
+        <span>/</span>
+        <span className="rounded-md bg-slate/10 px-2 py-0.5 font-medium text-slate">
+          {crumb}
+        </span>
       </nav>
 
       {/* Search */}
@@ -121,17 +100,10 @@ export default function Topbar({ name, email, onMenu, onLogout }: TopbarProps) {
         >
           <HelpCircle className="h-5 w-5" />
         </button>
-        <button
-          type="button"
-          aria-label="Settings"
-          className="hidden h-9 w-9 items-center justify-center rounded-lg text-mediumgray transition-colors hover:bg-[#f1f5f9] hover:text-navy sm:flex"
-        >
-          <Settings className="h-5 w-5" />
-        </button>
 
         <button
           type="button"
-          className="ml-1 hidden items-center gap-1.5 rounded-lg bg-primary-gradient px-3.5 py-2 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(59,130,246,0.25)] transition-transform hover:-translate-y-0.5 sm:inline-flex"
+          className="ml-1 hidden items-center gap-1.5 rounded-lg bg-cta-gradient px-3.5 py-2 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(234,88,12,0.25)] transition-transform hover:-translate-y-0.5 sm:inline-flex"
         >
           <Sparkles className="h-4 w-4" />
           Upgrade
@@ -143,7 +115,7 @@ export default function Topbar({ name, email, onMenu, onLogout }: TopbarProps) {
             aria-haspopup="menu"
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen((v) => !v)}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-slate text-sm font-semibold text-white ring-2 ring-slate/15 transition-transform hover:scale-105"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-orange text-sm font-semibold text-white ring-2 ring-orange/15 transition-transform hover:scale-105"
           >
             {initial}
           </button>
@@ -155,8 +127,8 @@ export default function Topbar({ name, email, onMenu, onLogout }: TopbarProps) {
               style={{ animation: "fade-in 0.18s ease-out" }}
             >
               <div className="border-b border-lightgray px-4 py-2.5">
-                <p className="truncate text-sm font-semibold text-navy">{name}</p>
-                <p className="truncate text-xs text-mediumgray">{email}</p>
+                <p className="truncate text-sm font-semibold text-navy">{student.name}</p>
+                <p className="truncate text-xs text-mediumgray">{student.email}</p>
               </div>
               <Link
                 href="/student/profile"

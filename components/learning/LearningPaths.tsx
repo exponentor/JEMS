@@ -12,8 +12,7 @@ import {
   Play,
   Sparkles,
 } from "lucide-react";
-import DashboardShell from "@/components/dashboard/student/DashboardShell";
-import PageHeader from "@/components/dashboard/student/PageHeader";
+import DashboardShell, { DashboardContainer } from "@/components/dashboard/student/DashboardShell";
 import { Card, EmptyState, ProgressBar } from "@/components/dashboard/student/ui";
 import type { LearningPathView, LearningStatus } from "@/lib/db/student-data";
 
@@ -55,8 +54,7 @@ export default function LearningPaths({ paths }: { paths: LearningPathView[] }) 
   if (paths.length === 0) {
     return (
       <DashboardShell>
-        <div className="mx-auto max-w-6xl space-y-6">
-          <PageHeader title="Learning Paths" crumb="Learning Paths" />
+        <DashboardContainer className="space-y-6">
           <EmptyState
             icon={Layers}
             title="No learning paths yet"
@@ -64,16 +62,14 @@ export default function LearningPaths({ paths }: { paths: LearningPathView[] }) 
             ctaLabel="Set your target role"
             ctaHref="/student/profile"
           />
-        </div>
+        </DashboardContainer>
       </DashboardShell>
     );
   }
 
   return (
     <DashboardShell>
-      <div className="mx-auto max-w-6xl space-y-6">
-        <PageHeader title="Learning Paths" crumb="Learning Paths" />
-
+      <DashboardContainer className="space-y-6">
         {/* Continue learning */}
         {featured && (
           <Card className="overflow-hidden">
@@ -96,7 +92,7 @@ export default function LearningPaths({ paths }: { paths: LearningPathView[] }) 
               </div>
               <button
                 type="button"
-                className="shrink-0 self-start rounded-lg bg-primary-gradient px-5 py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(59,130,246,0.25)] transition-transform hover:-translate-y-0.5 sm:self-auto"
+                className="shrink-0 self-start rounded-lg bg-primary-gradient px-5 py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(234,88,12,0.25)] transition-transform hover:-translate-y-0.5 sm:self-auto"
               >
                 {featured.progress > 0 ? "Resume path" : "Start path"}
               </button>
@@ -169,7 +165,7 @@ export default function LearningPaths({ paths }: { paths: LearningPathView[] }) 
             );
           })}
         </div>
-      </div>
+      </DashboardContainer>
     </DashboardShell>
   );
 }

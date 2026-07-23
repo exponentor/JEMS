@@ -1,42 +1,42 @@
 "use client";
 
-import { signOut } from "next-auth/react";
-import { useState } from "react";
-import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
-import { useStudent } from "./StudentContext";
+import { useSidebarPinned } from "./sidebar-context";
+
+/** Page content wrapper that widens to use the extra room freed up when the sidebar isn't pinned open. */
+export function DashboardContainer({
+  className = "",
+  children,
+}: {
+  className?: string;
+  children: React.ReactNode;
+}) {
+  const pinned = useSidebarPinned();
+  return (
+    <div
+      className={`mx-auto transition-[max-width] duration-300 ease-in-out ${
+        pinned ? "max-w-6xl" : "max-w-7xl"
+      } ${className}`}
+    >
+      {children}
+    </div>
+  );
+}
 
 /**
- * Shared chrome for every student dashboard screen: the Constructor-X style
- * sidebar + topbar with the page content rendered in the main column.
+ * Per-page chrome: the topbar plus the main content column. The sidebar
+ * itself lives in StudentShell (rendered once by the layout) so it survives
+ * navigating between dashboard pages.
  */
 export default function DashboardShell({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const student = useStudent();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
   return (
-    <div className="min-h-screen bg-[#f1f5f9]">
-      <Sidebar
-        open={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-        name={student.name}
-        email={student.email}
-      />
-
-      <div className="flex min-h-screen flex-col lg:pl-16">
-        <Topbar
-          name={student.name}
-          email={student.email}
-          onMenu={() => setSidebarOpen(true)}
-          onLogout={() => signOut({ callbackUrl: "/" })}
-        />
-
-        <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">{children}</main>
-      </div>
-    </div>
+    <>
+      <Topbar />
+      <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">{children}</main>
+    </>
   );
 }

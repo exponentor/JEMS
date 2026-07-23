@@ -14,8 +14,7 @@ import {
   User,
 } from "lucide-react";
 import Link from "next/link";
-import DashboardShell from "@/components/dashboard/student/DashboardShell";
-import PageHeader from "@/components/dashboard/student/PageHeader";
+import DashboardShell, { DashboardContainer } from "@/components/dashboard/student/DashboardShell";
 import { Card } from "@/components/dashboard/student/ui";
 
 interface Category {
@@ -66,9 +65,7 @@ export default function HelpCenter() {
 
   return (
     <DashboardShell>
-      <div className="mx-auto max-w-6xl space-y-6">
-        <PageHeader title="Help Center" crumb="Help Center" />
-
+      <DashboardContainer className="space-y-6">
         {/* Search hero */}
         <Card className="p-8 text-center">
           <h2 className="text-xl font-bold text-navy">How can we help?</h2>
@@ -171,7 +168,7 @@ export default function HelpCenter() {
             Contact Support
           </Link>
         </Card>
-      </div>
+      </DashboardContainer>
     </DashboardShell>
   );
 }

@@ -4,7 +4,6 @@ import { useState } from "react";
 import { signOut } from "next-auth/react";
 import { Check } from "lucide-react";
 import DashboardShell from "@/components/dashboard/student/DashboardShell";
-import PageHeader from "@/components/dashboard/student/PageHeader";
 import { Card, Toggle } from "@/components/dashboard/student/ui";
 import { useStudent } from "@/components/dashboard/student/StudentContext";
 
@@ -106,8 +105,6 @@ export default function Settings() {
   return (
     <DashboardShell>
       <div className="mx-auto max-w-3xl space-y-6">
-        <PageHeader title="Settings" crumb="Settings" />
-
         {/* Account */}
         <SettingsCard title="Account" desc="Update your personal details.">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -171,7 +168,7 @@ export default function Settings() {
           <button
             type="button"
             onClick={save}
-            className="rounded-lg bg-primary-gradient px-6 py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(59,130,246,0.25)] transition-transform hover:-translate-y-0.5"
+            className="rounded-lg bg-primary-gradient px-6 py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(234,88,12,0.25)] transition-transform hover:-translate-y-0.5"
           >
             Save changes
           </button>

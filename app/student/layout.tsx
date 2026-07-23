@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
+import StudentShell from "@/components/dashboard/student/StudentShell";
 import { StudentProvider } from "@/components/dashboard/student/StudentContext";
 import { getStudentView } from "@/lib/student";
 
@@ -19,5 +20,11 @@ export default async function StudentLayout({
   const student = await getStudentView(session.user.id);
   if (!student) redirect("/login");
 
-  return <StudentProvider value={student}>{children}</StudentProvider>;
+  return (
+    <StudentProvider value={student}>
+      <StudentShell name={student.name} email={student.email}>
+        {children}
+      </StudentShell>
+    </StudentProvider>
+  );
 }

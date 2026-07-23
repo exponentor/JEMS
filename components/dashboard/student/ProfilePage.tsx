@@ -17,8 +17,7 @@ import {
   Trash2,
   Upload,
 } from "lucide-react";
-import DashboardShell from "./DashboardShell";
-import PageHeader from "./PageHeader";
+import DashboardShell, { DashboardContainer } from "./DashboardShell";
 import type { StudentProfileView } from "@/lib/db/student-data";
 
 type IconType = React.ComponentType<{ className?: string }>;
@@ -230,9 +229,7 @@ export default function ProfilePage({
 
   return (
     <DashboardShell>
-      <div className="mx-auto max-w-6xl space-y-6">
-        <PageHeader title="User Profile" crumb="Profile" />
-
+      <DashboardContainer className="space-y-6">
         {/* Cover + identity */}
         <div className="overflow-hidden rounded-2xl border border-lightgray bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
           <div className="h-40 bg-[linear-gradient(120deg,#c7d2fe_0%,#a5b4fc_45%,#bae6fd_100%)] sm:h-48" />
@@ -495,7 +492,7 @@ export default function ProfilePage({
                 <button
                   type="submit"
                   disabled={!dirty || status === "saving"}
-                  className="inline-flex items-center gap-2 rounded-xl bg-primary-gradient px-5 py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(59,130,246,0.25)] transition-transform hover:-translate-y-0.5 disabled:translate-y-0 disabled:opacity-60"
+                  className="inline-flex items-center gap-2 rounded-xl bg-primary-gradient px-5 py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(234,88,12,0.25)] transition-transform hover:-translate-y-0.5 disabled:translate-y-0 disabled:opacity-60"
                 >
                   {status === "saving" && <Loader2 className="h-4 w-4 animate-spin" />}
                   {status === "saving" ? "Saving…" : "Save Changes"}
@@ -504,7 +501,7 @@ export default function ProfilePage({
             </form>
           </div>
         </div>
-      </div>
+      </DashboardContainer>
     </DashboardShell>
   );
 }

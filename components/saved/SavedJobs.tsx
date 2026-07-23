@@ -3,8 +3,7 @@
 import { useState } from "react";
 import { Bookmark, MapPin, Trash2 } from "lucide-react";
 import Link from "next/link";
-import DashboardShell from "@/components/dashboard/student/DashboardShell";
-import PageHeader from "@/components/dashboard/student/PageHeader";
+import DashboardShell, { DashboardContainer } from "@/components/dashboard/student/DashboardShell";
 import { Card } from "@/components/dashboard/student/ui";
 
 import type { SavedJobView } from "@/lib/db/student-data";
@@ -21,9 +20,7 @@ export default function SavedJobs({ saved }: { saved: SavedJobView[] }) {
 
   return (
     <DashboardShell>
-      <div className="mx-auto max-w-6xl space-y-6">
-        <PageHeader title="Saved Jobs" crumb="Saved Jobs" />
-
+      <DashboardContainer className="space-y-6">
         {jobs.length === 0 ? (
           <Card className="flex flex-col items-center justify-center px-6 py-16 text-center">
             <span className="flex h-12 w-12 items-center justify-center rounded-full bg-slate/10 text-slate">
@@ -79,7 +76,7 @@ export default function SavedJobs({ saved }: { saved: SavedJobView[] }) {
                     </button>
                     <button
                       type="button"
-                      className="rounded-lg bg-primary-gradient px-5 py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(59,130,246,0.25)] transition-transform hover:-translate-y-0.5"
+                      className="rounded-lg bg-primary-gradient px-5 py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(234,88,12,0.25)] transition-transform hover:-translate-y-0.5"
                     >
                       Apply
                     </button>
@@ -89,7 +86,7 @@ export default function SavedJobs({ saved }: { saved: SavedJobView[] }) {
             </div>
           </>
         )}
-      </div>
+      </DashboardContainer>
     </DashboardShell>
   );
 }

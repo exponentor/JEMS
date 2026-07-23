@@ -1,8 +1,7 @@
 "use client";
 
 import { Award, BookOpen, Flame, Mic, Trophy } from "lucide-react";
-import DashboardShell from "@/components/dashboard/student/DashboardShell";
-import PageHeader from "@/components/dashboard/student/PageHeader";
+import DashboardShell, { DashboardContainer } from "@/components/dashboard/student/DashboardShell";
 import { Card, ProgressBar } from "@/components/dashboard/student/ui";
 import type { ProgressData } from "@/lib/db/student-data";
 
@@ -30,9 +29,7 @@ export default function MyProgress({ data }: { data: ProgressData }) {
 
   return (
     <DashboardShell>
-      <div className="mx-auto max-w-6xl space-y-6">
-        <PageHeader title="My Progress" crumb="My Progress" />
-
+      <DashboardContainer className="space-y-6">
         {/* Readiness */}
         <Card className="p-6">
           <div className="flex items-center justify-between">
@@ -132,7 +129,7 @@ export default function MyProgress({ data }: { data: ProgressData }) {
             ))}
           </div>
         </Card>
-      </div>
+      </DashboardContainer>
     </DashboardShell>
   );
 }

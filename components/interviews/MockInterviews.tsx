@@ -9,8 +9,7 @@ import {
   Target,
   TrendingUp,
 } from "lucide-react";
-import DashboardShell from "@/components/dashboard/student/DashboardShell";
-import PageHeader from "@/components/dashboard/student/PageHeader";
+import DashboardShell, { DashboardContainer } from "@/components/dashboard/student/DashboardShell";
 import { Card } from "@/components/dashboard/student/ui";
 import type { MockInterviewData } from "@/lib/db/student-data";
 
@@ -44,9 +43,7 @@ export default function MockInterviews({ data }: { data: MockInterviewData }) {
 
   return (
     <DashboardShell>
-      <div className="mx-auto max-w-6xl space-y-6">
-        <PageHeader title="Mock Interviews" crumb="Mock Interviews" />
-
+      <DashboardContainer className="space-y-6">
         {/* Stats */}
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           {STATS.map((s, i) => (
@@ -79,7 +76,7 @@ export default function MockInterviews({ data }: { data: MockInterviewData }) {
                   <p className="mt-3 text-xs font-medium text-mediumgray">{t.duration}</p>
                   <button
                     type="button"
-                    className="mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-primary-gradient py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(59,130,246,0.25)] transition-transform group-hover:-translate-y-0.5"
+                    className="mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-primary-gradient py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(234,88,12,0.25)] transition-transform group-hover:-translate-y-0.5"
                   >
                     <Play className="h-4 w-4" />
                     Start
@@ -94,7 +91,7 @@ export default function MockInterviews({ data }: { data: MockInterviewData }) {
         <Card>
           <div className="flex items-center justify-between border-b border-lightgray px-5 py-3.5">
             <h2 className="text-sm font-semibold text-navy">Past interviews</h2>
-            <button type="button" className="text-xs font-semibold text-slate hover:text-[#2563eb]">
+            <button type="button" className="text-xs font-semibold text-slate hover:text-[#c2410c]">
               View all
             </button>
           </div>
@@ -122,7 +119,7 @@ export default function MockInterviews({ data }: { data: MockInterviewData }) {
             </ul>
           )}
         </Card>
-      </div>
+      </DashboardContainer>
     </DashboardShell>
   );
 }

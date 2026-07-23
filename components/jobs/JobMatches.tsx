@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { Bookmark, BookmarkCheck, MapPin, Search, Target } from "lucide-react";
-import DashboardShell from "@/components/dashboard/student/DashboardShell";
-import PageHeader from "@/components/dashboard/student/PageHeader";
+import DashboardShell, { DashboardContainer } from "@/components/dashboard/student/DashboardShell";
 import { Card, EmptyState } from "@/components/dashboard/student/ui";
 import type { JobMatchView } from "@/lib/db/student-data";
 
@@ -46,8 +45,7 @@ export default function JobMatches({
   if (jobs.length === 0) {
     return (
       <DashboardShell>
-        <div className="mx-auto max-w-6xl space-y-6">
-          <PageHeader title="Job Matches" crumb="Job Matches" />
+        <DashboardContainer className="space-y-6">
           <EmptyState
             icon={Target}
             title="No job matches yet"
@@ -55,16 +53,14 @@ export default function JobMatches({
             ctaLabel="Build your resume"
             ctaHref="/student/resume"
           />
-        </div>
+        </DashboardContainer>
       </DashboardShell>
     );
   }
 
   return (
     <DashboardShell>
-      <div className="mx-auto max-w-6xl space-y-6">
-        <PageHeader title="Job Matches" crumb="Job Matches" />
-
+      <DashboardContainer className="space-y-6">
         {/* Search + filters */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <div className="relative flex-1">
@@ -139,7 +135,7 @@ export default function JobMatches({
                   </button>
                   <button
                     type="button"
-                    className="rounded-lg bg-primary-gradient px-5 py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(59,130,246,0.25)] transition-transform hover:-translate-y-0.5"
+                    className="rounded-lg bg-primary-gradient px-5 py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(234,88,12,0.25)] transition-transform hover:-translate-y-0.5"
                   >
                     Apply
                   </button>
@@ -148,7 +144,7 @@ export default function JobMatches({
             );
           })}
         </div>
-      </div>
+      </DashboardContainer>
     </DashboardShell>
   );
 }

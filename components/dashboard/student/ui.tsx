@@ -67,7 +67,7 @@ export function EmptyState({
       {ctaLabel && ctaHref && (
         <Link
           href={ctaHref}
-          className="mt-5 inline-flex items-center justify-center rounded-lg bg-primary-gradient px-5 py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(59,130,246,0.25)] transition-transform hover:-translate-y-0.5"
+          className="mt-5 inline-flex items-center justify-center rounded-lg bg-primary-gradient px-5 py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(234,88,12,0.25)] transition-transform hover:-translate-y-0.5"
         >
           {ctaLabel}
         </Link>

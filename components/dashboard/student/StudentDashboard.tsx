@@ -12,8 +12,7 @@ import {
   Target,
   TrendingUp,
 } from "lucide-react";
-import DashboardShell from "./DashboardShell";
-import PageHeader from "./PageHeader";
+import DashboardShell, { DashboardContainer } from "./DashboardShell";
 import { useStudent } from "./StudentContext";
 import type { DashboardData } from "@/lib/db/student-data";
 
@@ -56,7 +55,7 @@ function SectionHead({
       {action && href && (
         <Link
           href={href}
-          className="inline-flex items-center gap-0.5 text-xs font-semibold text-slate transition-colors hover:text-[#2563eb]"
+          className="inline-flex items-center gap-0.5 text-xs font-semibold text-slate transition-colors hover:text-[#c2410c]"
         >
           {action}
           <ChevronRight className="h-3.5 w-3.5" />
@@ -148,9 +147,7 @@ export default function StudentDashboard({ data }: { data: DashboardData }) {
 
   return (
     <DashboardShell>
-      <div className="mx-auto max-w-6xl space-y-6">
-        <PageHeader title="Dashboard" crumb="Dashboard" />
-
+      <DashboardContainer className="space-y-6">
         {/* Header */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -367,7 +364,7 @@ export default function StudentDashboard({ data }: { data: DashboardData }) {
             </Card>
           </div>
         </div>
-      </div>
+      </DashboardContainer>
     </DashboardShell>
   );
 }

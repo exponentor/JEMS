@@ -5,10 +5,10 @@ import { GripVertical, Plus, Trash2 } from "lucide-react";
 import { reorder } from "./types";
 
 export const rInput =
-  "h-10 w-full rounded-md border border-lightgray bg-white px-3 text-sm text-navy shadow-[0_1px_3px_rgba(0,0,0,0.08)] outline-none transition-all placeholder:text-mediumgray focus:border-slate focus:shadow-[0_4px_12px_rgba(59,130,246,0.15)]";
+  "h-10 w-full rounded-md border border-lightgray bg-white px-3 text-sm text-navy shadow-[0_1px_3px_rgba(0,0,0,0.08)] outline-none transition-all placeholder:text-mediumgray focus:border-slate focus:shadow-[0_4px_12px_rgba(234,88,12,0.15)]";
 
 export const rTextarea =
-  "min-h-20 w-full resize-y rounded-md border border-lightgray bg-white px-3 py-2 text-sm leading-6 text-navy shadow-[0_1px_3px_rgba(0,0,0,0.08)] outline-none transition-all placeholder:text-mediumgray focus:border-slate focus:shadow-[0_4px_12px_rgba(59,130,246,0.15)]";
+  "min-h-20 w-full resize-y rounded-md border border-lightgray bg-white px-3 py-2 text-sm leading-6 text-navy shadow-[0_1px_3px_rgba(0,0,0,0.08)] outline-none transition-all placeholder:text-mediumgray focus:border-slate focus:shadow-[0_4px_12px_rgba(234,88,12,0.15)]";
 
 function Label({ children, optional }: { children: ReactNode; optional?: boolean }) {
   return (

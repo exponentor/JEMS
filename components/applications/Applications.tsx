@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { Briefcase } from "lucide-react";
-import DashboardShell from "@/components/dashboard/student/DashboardShell";
-import PageHeader from "@/components/dashboard/student/PageHeader";
+import DashboardShell, { DashboardContainer } from "@/components/dashboard/student/DashboardShell";
 import { Card, EmptyState } from "@/components/dashboard/student/ui";
 import type { ApplicationView } from "@/lib/db/student-data";
 
@@ -34,8 +33,7 @@ export default function Applications({ apps }: { apps: ApplicationView[] }) {
   if (apps.length === 0) {
     return (
       <DashboardShell>
-        <div className="mx-auto max-w-6xl space-y-6">
-          <PageHeader title="Applications" crumb="Applications" />
+        <DashboardContainer className="space-y-6">
           <EmptyState
             icon={Briefcase}
             title="No applications yet"
@@ -43,16 +41,14 @@ export default function Applications({ apps }: { apps: ApplicationView[] }) {
             ctaLabel="Browse Job Matches"
             ctaHref="/student/jobs"
           />
-        </div>
+        </DashboardContainer>
       </DashboardShell>
     );
   }
 
   return (
     <DashboardShell>
-      <div className="mx-auto max-w-6xl space-y-6">
-        <PageHeader title="Applications" crumb="Applications" />
-
+      <DashboardContainer className="space-y-6">
         {/* Pipeline stats */}
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           {(Object.keys(counts) as (keyof typeof counts)[]).map((k) => (
@@ -125,7 +121,7 @@ export default function Applications({ apps }: { apps: ApplicationView[] }) {
             </p>
           )}
         </Card>
-      </div>
+      </DashboardContainer>
     </DashboardShell>
   );
 }

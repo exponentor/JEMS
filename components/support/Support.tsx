@@ -8,8 +8,7 @@ import {
   MessageCircle,
   Phone,
 } from "lucide-react";
-import DashboardShell from "@/components/dashboard/student/DashboardShell";
-import PageHeader from "@/components/dashboard/student/PageHeader";
+import DashboardShell, { DashboardContainer } from "@/components/dashboard/student/DashboardShell";
 import { Card } from "@/components/dashboard/student/ui";
 
 interface Channel {
@@ -70,9 +69,7 @@ export default function Support() {
 
   return (
     <DashboardShell>
-      <div className="mx-auto max-w-6xl space-y-6">
-        <PageHeader title="Support" crumb="Support" />
-
+      <DashboardContainer className="space-y-6">
         {/* Channels */}
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
           {CHANNELS.map((c) => {
@@ -176,7 +173,7 @@ export default function Support() {
                   </div>
                   <button
                     type="submit"
-                    className="w-full rounded-lg bg-primary-gradient py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(59,130,246,0.25)] transition-transform hover:-translate-y-0.5 sm:w-auto sm:px-8"
+                    className="w-full rounded-lg bg-primary-gradient py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(234,88,12,0.25)] transition-transform hover:-translate-y-0.5 sm:w-auto sm:px-8"
                   >
                     Submit ticket
                   </button>
@@ -206,7 +203,7 @@ export default function Support() {
             </ul>
           </Card>
         </div>
-      </div>
+      </DashboardContainer>
     </DashboardShell>
   );
 }
