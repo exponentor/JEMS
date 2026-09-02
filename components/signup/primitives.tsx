@@ -9,7 +9,7 @@ import type { CardOption } from "./data";
  * defined by `.signup-input` (default / focus / error) in globals.css.
  */
 export const inputClass =
-  "signup-input h-11 w-full rounded-lg bg-white px-3 text-sm text-navy outline-none transition-shadow duration-200 placeholder:text-mediumgray";
+  "signup-input h-11 w-full rounded-lg bg-white px-3.5 text-sm text-navy outline-none transition-all duration-200 placeholder:text-mediumgray/70";
 
 function CheckCircle() {
   return (
@@ -113,7 +113,7 @@ export function SelectField({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           aria-invalid={error ? true : undefined}
-          className={`${inputClass} appearance-none pr-9 ${value ? "" : "text-mediumgray"}`}
+          className={`${inputClass} cursor-pointer appearance-none pr-9 ${value ? "" : "text-mediumgray"}`}
         >
           <option value="" disabled>
             {placeholder}
@@ -137,7 +137,6 @@ export function SelectField({
       </div>
       <FieldError show={!!error}>{error}</FieldError>
     </div>
-    
   );
 }
 
@@ -206,10 +205,10 @@ export function OptionCards({
                     }
                   : undefined
               }
-              className={`group relative flex min-h-[60px] items-center gap-3 rounded-xl bg-white px-3.5 py-2.5 text-left transition-all duration-200 ${
+              className={`group relative flex min-h-[60px] items-center gap-3 rounded-xl border bg-white px-3.5 py-2.5 text-left transition-all duration-200 ${
                 selected
-                  ? ""
-                  : "shadow-[0_2px_6px_rgba(0,0,0,0.07)] hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(0,0,0,0.1)]"
+                  ? "border-transparent"
+                  : "border-lightgray/80 shadow-[0_1px_2px_rgba(17,24,39,0.04)] hover:-translate-y-0.5 hover:border-mediumgray/30 hover:shadow-[0_6px_16px_rgba(17,24,39,0.08)]"
               }`}
             >
               <span className="min-w-0 flex-1">
@@ -223,13 +222,13 @@ export function OptionCards({
 
               <span
                 aria-hidden="true"
-                className={`flex h-5 w-5 shrink-0 items-center justify-center border-2 transition-colors ${
+                className={`flex h-5 w-5 shrink-0 items-center justify-center border-[1.5px] transition-colors ${
                   multiple ? "rounded-md" : "rounded-full"
                 }`}
                 style={
                   selected
                     ? { backgroundColor: "var(--accent)", borderColor: "var(--accent)" }
-                    : { borderColor: "#d1d5db" }
+                    : { borderColor: "#cbd1db" }
                 }
               >
                 {selected && <Check className="h-3 w-3 text-white" strokeWidth={3.5} />}

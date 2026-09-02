@@ -15,7 +15,7 @@ import {
 import { PasswordField } from "./PasswordField";
 import { ProgressBar } from "./ProgressBar";
 import { OptionCards, SelectField, TextInput } from "./primitives";
-import { evaluatePassword, isEmailLike, isPhoneLike } from "./password";
+import { evaluatePassword, isEmailLike } from "./password";
 import { StepCarousel } from "./StepCarousel";
 import { SuccessPanel } from "./SuccessPanel";
 import { VerifiableField } from "./VerifiableField";
@@ -26,9 +26,9 @@ const ROLE_OPTIONS = [
 ];
 
 const PRIMARY_BTN =
-  "rounded-lg bg-[#6366f1] px-7 py-3 text-sm font-semibold text-white shadow-[0_2px_8px_rgba(99,102,241,0.18)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#4f46e5] hover:shadow-[0_6px_16px_rgba(99,102,241,0.28)]";
+  "rounded-lg bg-[#6366f1] px-7 py-3 text-sm font-semibold text-white shadow-[0_2px_8px_rgba(99,102,241,0.25)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#4f46e5] hover:shadow-[0_10px_20px_rgba(99,102,241,0.3)] active:translate-y-0 active:shadow-[0_2px_8px_rgba(99,102,241,0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6366f1]/40 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:translate-y-0 disabled:shadow-[0_2px_8px_rgba(99,102,241,0.15)]";
 const BACK_BTN =
-  "rounded-lg bg-white px-6 py-3 text-sm font-semibold text-navy shadow-[0_1px_3px_rgba(0,0,0,0.08)] transition-shadow duration-200 hover:shadow-[0_2px_6px_rgba(0,0,0,0.12)]";
+  "signup-chip-btn rounded-lg bg-white px-6 py-3 text-sm font-semibold text-navy transition-all duration-200 hover:text-navy";
 
 interface StudentSignupProps {
   onBack: () => void;
@@ -45,8 +45,6 @@ export default function StudentSignup({ onBack }: StudentSignupProps) {
   const [emailVerified, setEmailVerified] = useState(false);
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
-  const [phone, setPhone] = useState("");
-  const [phoneVerified, setPhoneVerified] = useState(false);
 
   // Page 2 — career setup
   const [level, setLevel] = useState("");
@@ -60,12 +58,11 @@ export default function StudentSignup({ onBack }: StudentSignupProps) {
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   // The user's own info — barred from appearing anywhere in the password.
-  const forbiddenTerms = [name, email, phone];
+  const forbiddenTerms = [name, email];
 
   const emailOk = isEmailLike(email);
   const passwordOk = evaluatePassword(password, forbiddenTerms).acceptable;
   const confirmOk = confirm.length > 0 && confirm === password;
-  const phoneProvided = phone.trim().length > 0;
   const targetRole = role === "Other" ? roleOther.trim() : role;
 
   const page1Ok =
@@ -73,8 +70,7 @@ export default function StudentSignup({ onBack }: StudentSignupProps) {
     emailVerified &&
     passwordOk &&
     confirmOk &&
-    name.trim().length > 0 &&
-    (!phoneProvided || phoneVerified);
+    name.trim().length > 0;
 
   const page2Ok = !!level && !!targetRole && !!learning && !!years;
 
@@ -102,7 +98,6 @@ export default function StudentSignup({ onBack }: StudentSignupProps) {
           name,
           email,
           password,
-          phone,
           experienceLevel: level,
           targetRole,
           learningStyle: learning,
@@ -150,11 +145,17 @@ export default function StudentSignup({ onBack }: StudentSignupProps) {
       </button>
 
       {step < 2 && (
-        <div className="mb-4">
-          <h1 className="text-2xl font-bold tracking-tight text-navy">
+        <div className="mb-5">
+          <p
+            className="text-xs font-bold uppercase tracking-[0.14em]"
+            style={{ color: "var(--accent)" }}
+          >
+            Student sign up
+          </p>
+          <h1 className="mt-1 text-[28px] font-bold tracking-tight text-navy">
             Create your account
           </h1>
-          <p className="mt-1 text-sm text-mediumgray">Step {step + 1} of 3</p>
+          <p className="mt-1.5 text-sm text-mediumgray">Step {step + 1} of 3</p>
         </div>
       )}
 
@@ -215,64 +216,45 @@ export default function StudentSignup({ onBack }: StudentSignupProps) {
               />
             </div>
 
-            <PasswordField
-              id="st-confirm"
-              label="Confirm Password"
-              value={confirm}
-              onChange={setConfirm}
-              valid={confirmOk}
-              error={
-                (tried || confirm.length > 0) && !confirmOk
-                  ? "Passwords don't match."
-                  : null
-              }
-            />
-
-            <VerifiableField
-              id="st-phone"
-              label="Phone Number"
-              type="tel"
-              channel="phone"
-              optional
-              autoComplete="tel"
-              placeholder="+1 (555) 000-0000"
-              value={phone}
-              onChange={(v) => {
-                setPhone(v);
-                setPhoneVerified(false);
-              }}
-              verified={phoneVerified}
-              onVerified={() => setPhoneVerified(true)}
-              canVerify={isPhoneLike(phone)}
-              error={
-                tried && phoneProvided && !phoneVerified
-                  ? "Verify your number, or clear it to skip."
-                  : null
-              }
-            />
+            <div className="sm:col-span-2">
+              <PasswordField
+                id="st-confirm"
+                label="Confirm Password"
+                value={confirm}
+                onChange={setConfirm}
+                valid={confirmOk}
+                error={
+                  (tried || confirm.length > 0) && !confirmOk
+                    ? "Passwords don't match."
+                    : null
+                }
+              />
+            </div>
 
             <div className="pt-1 sm:col-span-2">
-              <GithubButton intent="signup" className="rounded-lg" />
+              <div className="mx-auto w-full max-w-sm">
+                <GithubButton intent="signup" className="rounded-lg" />
 
-              <div className="my-4 flex items-center gap-3 text-xs text-mediumgray">
-                <span className="h-px flex-1 bg-lightgray" />
-                or with email
-                <span className="h-px flex-1 bg-lightgray" />
+                <div className="my-4 flex items-center gap-3 text-xs text-mediumgray">
+                  <span className="h-px flex-1 bg-lightgray" />
+                  or with email
+                  <span className="h-px flex-1 bg-lightgray" />
+                </div>
+
+                <button type="button" onClick={goNext} className={`w-full ${PRIMARY_BTN}`}>
+                  Next
+                </button>
+                <p className="mt-3 text-center text-sm text-mediumgray">
+                  Already have an account?{" "}
+                  <Link
+                    href="/login"
+                    className="font-semibold hover:underline"
+                    style={{ color: "var(--accent)" }}
+                  >
+                    Log in
+                  </Link>
+                </p>
               </div>
-
-              <button type="button" onClick={goNext} className={`w-full ${PRIMARY_BTN}`}>
-                Next
-              </button>
-              <p className="mt-3 text-center text-sm text-mediumgray">
-                Already have an account?{" "}
-                <Link
-                  href="/login"
-                  className="font-semibold hover:underline"
-                  style={{ color: "var(--accent)" }}
-                >
-                  Log in
-                </Link>
-              </p>
             </div>
           </div>
 
@@ -342,7 +324,7 @@ export default function StudentSignup({ onBack }: StudentSignupProps) {
               </p>
             )}
 
-            <div className="flex items-center gap-3 pt-1 sm:col-span-2">
+            <div className="mx-auto flex w-full max-w-sm items-center gap-3 pt-1 sm:col-span-2">
               <button
                 type="button"
                 onClick={() => {

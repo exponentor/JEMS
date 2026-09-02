@@ -18,10 +18,14 @@ interface OtpModalProps {
 }
 
 /**
- * OTP entry UI — front-end only. Any 6 digits "verify" successfully; there is
- * no backend yet. Rendered through a portal to `document.body` so it always
- * covers the viewport (the signup steps live inside a transformed, clipped
- * carousel that would otherwise trap a `position: fixed` overlay).
+ * OTP entry UI. For `channel: "email"` this sends and verifies a real code
+ * against `/api/auth/send-signup-otp` and `/api/auth/verify-signup-otp`.
+ * There is no SMS provider configured yet, so `channel: "phone"` stays
+ * front-end only — any 6 digits "verify" successfully.
+ *
+ * Rendered through a portal to `document.body` so it always covers the
+ * viewport (the signup steps live inside a transformed, clipped carousel
+ * that would otherwise trap a `position: fixed` overlay).
  *
  * The component is mounted only while open, so its initial state is always
  * fresh — no reset effect needed.
@@ -33,9 +37,42 @@ export function OtpModal({
   onClose,
   onVerified,
 }: OtpModalProps) {
+  const isEmail = channel === "email";
   const [digits, setDigits] = useState<string[]>(Array(LENGTH).fill(""));
   const [seconds, setSeconds] = useState(30);
+  const [sending, setSending] = useState(isEmail);
+  const [verifying, setVerifying] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const inputs = useRef<(HTMLInputElement | null)[]>([]);
+
+  const sendCode = async () => {
+    setSending(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/auth/send-signup-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: destination }),
+      });
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
+      if (!res.ok) {
+        setError(data.error ?? "Could not send the code. Please try again.");
+      }
+    } catch {
+      setError("Network error. Please try again.");
+    } finally {
+      setSending(false);
+    }
+  };
+
+  // Send the initial code once, for email only. Deferred a tick so the
+  // effect body itself never calls setState synchronously.
+  useEffect(() => {
+    if (!isEmail) return;
+    const t = setTimeout(sendCode, 0);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Focus the first box once.
   useEffect(() => {
@@ -92,8 +129,37 @@ export function OtpModal({
     inputs.current[Math.min(pasted.length, LENGTH - 1)]?.focus();
   };
 
-  const submit = () => {
-    if (complete) onVerified();
+  const submit = async () => {
+    if (!complete) return;
+    if (!isEmail) {
+      onVerified();
+      return;
+    }
+    setVerifying(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/auth/verify-signup-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: destination, otp: digits.join("") }),
+      });
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
+      if (!res.ok) {
+        setError(data.error ?? "Invalid or expired code.");
+        return;
+      }
+      onVerified();
+    } catch {
+      setError("Network error. Please try again.");
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  const resend = () => {
+    setDigits(Array(LENGTH).fill(""));
+    setSeconds(30);
+    if (isEmail) sendCode();
   };
 
   if (typeof document === "undefined") return null;
@@ -141,7 +207,7 @@ export function OtpModal({
             Verify your {channel}
           </h3>
           <p className="mt-1.5 text-sm leading-relaxed text-mediumgray">
-            We sent a 6-digit code to
+            {isEmail && sending ? "Sending a 6-digit code to" : "We sent a 6-digit code to"}
             <br />
             <span className="font-semibold text-navy">
               {destination || (channel === "email" ? "your email" : "your phone")}
@@ -160,27 +226,32 @@ export function OtpModal({
               inputMode="numeric"
               maxLength={1}
               value={d}
+              disabled={isEmail && sending}
               onChange={(e) => setAt(i, e.target.value)}
               onKeyDown={(e) => onKeyDown(i, e)}
               aria-label={`Digit ${i + 1}`}
               style={d ? { borderColor: "var(--otp-accent)" } : undefined}
-              className="h-13 w-12 rounded-xl border-2 border-lightgray bg-white text-center text-xl font-bold text-navy shadow-[0_1px_3px_rgba(0,0,0,0.06)] outline-none transition-all duration-150 focus:border-[color:var(--otp-accent)] focus:shadow-[0_4px_12px_rgba(0,0,0,0.1)]"
+              className="h-13 w-12 rounded-xl border-2 border-lightgray bg-white text-center text-xl font-bold text-navy shadow-[0_1px_3px_rgba(0,0,0,0.06)] outline-none transition-all duration-150 focus:border-[color:var(--otp-accent)] focus:shadow-[0_4px_12px_rgba(0,0,0,0.1)] disabled:opacity-50"
             />
           ))}
         </div>
 
-        <p className="mt-3 text-center text-xs text-mediumgray">
-          Demo mode — enter any 6 digits to verify.
-        </p>
+        {error ? (
+          <p className="mt-3 text-center text-xs font-medium text-red-600">{error}</p>
+        ) : !isEmail ? (
+          <p className="mt-3 text-center text-xs text-mediumgray">
+            Demo mode — enter any 6 digits to verify.
+          </p>
+        ) : null}
 
         <button
           type="button"
           onClick={submit}
-          disabled={!complete}
+          disabled={!complete || sending || verifying}
           style={complete ? { backgroundColor: "var(--otp-accent)" } : undefined}
           className="mt-6 w-full rounded-xl bg-mediumgray/40 px-5 py-3 text-sm font-semibold text-white shadow-[0_2px_8px_rgba(0,0,0,0.12)] transition-all duration-200 enabled:hover:-translate-y-0.5 disabled:cursor-not-allowed"
         >
-          Verify
+          {verifying ? "Verifying…" : "Verify"}
         </button>
 
         <div className="mt-4 text-center text-xs text-mediumgray">
@@ -192,8 +263,9 @@ export function OtpModal({
           ) : (
             <button
               type="button"
-              onClick={() => setSeconds(30)}
-              className="font-semibold hover:underline"
+              onClick={resend}
+              disabled={sending}
+              className="font-semibold hover:underline disabled:cursor-not-allowed disabled:opacity-60"
               style={{ color: "var(--otp-accent)" }}
             >
               Resend code

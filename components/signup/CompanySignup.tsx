@@ -12,7 +12,7 @@ import {
 import { PasswordField } from "./PasswordField";
 import { ProgressBar } from "./ProgressBar";
 import { OptionCards, SelectField, TextInput } from "./primitives";
-import { evaluatePassword, isEmailLike, isPhoneLike } from "./password";
+import { evaluatePassword, isEmailLike } from "./password";
 import { StepCarousel } from "./StepCarousel";
 import { SuccessPanel } from "./SuccessPanel";
 import { VerifiableField } from "./VerifiableField";
@@ -21,9 +21,9 @@ const INDUSTRY_OPTIONS = INDUSTRIES.map((i) => ({ value: i, label: i }));
 const HIRING_ROLE_OPTIONS = HIRING_ROLES.map((r) => ({ value: r, title: r }));
 
 const PRIMARY_BTN =
-  "rounded-lg bg-orange px-7 py-3 text-sm font-semibold text-white shadow-[0_2px_8px_rgba(234,88,12,0.15)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#c2410c] hover:shadow-[0_4px_12px_rgba(234,88,12,0.2)]";
+  "rounded-lg bg-orange px-7 py-3 text-sm font-semibold text-white shadow-[0_2px_8px_rgba(234,88,12,0.25)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#c2410c] hover:shadow-[0_10px_20px_rgba(234,88,12,0.3)] active:translate-y-0 active:shadow-[0_2px_8px_rgba(234,88,12,0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange/40 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:translate-y-0 disabled:shadow-[0_2px_8px_rgba(234,88,12,0.15)]";
 const BACK_BTN =
-  "rounded-lg bg-white px-6 py-3 text-sm font-semibold text-navy shadow-[0_1px_3px_rgba(0,0,0,0.08)] transition-shadow duration-200 hover:shadow-[0_2px_6px_rgba(0,0,0,0.12)]";
+  "signup-chip-btn rounded-lg bg-white px-6 py-3 text-sm font-semibold text-navy transition-all duration-200 hover:text-navy";
 
 const isUrlLike = (value: string) =>
   /^(https?:\/\/)?([\w-]+\.)+[\w-]{2,}(\/\S*)?$/.test(value.trim());
@@ -49,8 +49,6 @@ export default function CompanySignup({ onBack }: CompanySignupProps) {
 
   // Page 2 — hiring setup
   const [manager, setManager] = useState("");
-  const [phone, setPhone] = useState("");
-  const [phoneVerified, setPhoneVerified] = useState(false);
   const [openings, setOpenings] = useState("");
   const [roles, setRoles] = useState<string[]>([]);
   const [remote, setRemote] = useState("");
@@ -58,7 +56,7 @@ export default function CompanySignup({ onBack }: CompanySignupProps) {
   const [redirectIn, setRedirectIn] = useState(5);
 
   // The user's own info — barred from appearing anywhere in the password.
-  const forbiddenTerms = [companyName, website, email, manager, phone];
+  const forbiddenTerms = [companyName, website, email, manager];
 
   const emailOk = isEmailLike(email);
   const websiteOk = isUrlLike(website);
@@ -78,8 +76,6 @@ export default function CompanySignup({ onBack }: CompanySignupProps) {
 
   const page2Ok =
     manager.trim().length > 0 &&
-    isPhoneLike(phone) &&
-    phoneVerified &&
     openingsOk &&
     roles.length > 0 &&
     !!remote;
@@ -123,11 +119,17 @@ export default function CompanySignup({ onBack }: CompanySignupProps) {
       </button>
 
       {step < 2 && (
-        <div className="mb-4">
-          <h1 className="text-2xl font-bold tracking-tight text-navy">
+        <div className="mb-5">
+          <p
+            className="text-xs font-bold uppercase tracking-[0.14em]"
+            style={{ color: "var(--accent)" }}
+          >
+            Company sign up
+          </p>
+          <h1 className="mt-1 text-[28px] font-bold tracking-tight text-navy">
             Create your account
           </h1>
-          <p className="mt-1 text-sm text-mediumgray">Step {step + 1} of 3</p>
+          <p className="mt-1.5 text-sm text-mediumgray">Step {step + 1} of 3</p>
         </div>
       )}
 
@@ -241,19 +243,21 @@ export default function CompanySignup({ onBack }: CompanySignupProps) {
             </div>
 
             <div className="pt-1 sm:col-span-2">
-              <button type="button" onClick={goNext} className={`w-full ${PRIMARY_BTN}`}>
-                Next
-              </button>
-              <p className="mt-3 text-center text-sm text-mediumgray">
-                Already have an account?{" "}
-                <Link
-                  href="/login"
-                  className="font-semibold hover:underline"
-                  style={{ color: "var(--accent)" }}
-                >
-                  Log in
-                </Link>
-              </p>
+              <div className="mx-auto w-full max-w-sm">
+                <button type="button" onClick={goNext} className={`w-full ${PRIMARY_BTN}`}>
+                  Next
+                </button>
+                <p className="mt-3 text-center text-sm text-mediumgray">
+                  Already have an account?{" "}
+                  <Link
+                    href="/login"
+                    className="font-semibold hover:underline"
+                    style={{ color: "var(--accent)" }}
+                  >
+                    Log in
+                  </Link>
+                </p>
+              </div>
             </div>
           </div>
 
@@ -292,33 +296,6 @@ export default function CompanySignup({ onBack }: CompanySignupProps) {
             />
 
             <div className="sm:col-span-2">
-              <VerifiableField
-                id="co-phone"
-                label="Phone Number"
-                type="tel"
-                channel="phone"
-                accent="#ea580c"
-                autoComplete="tel"
-                placeholder="+1 (555) 000-0000"
-                value={phone}
-                onChange={(v) => {
-                  setPhone(v);
-                  setPhoneVerified(false);
-                }}
-                verified={phoneVerified}
-                onVerified={() => setPhoneVerified(true)}
-                canVerify={isPhoneLike(phone)}
-                error={
-                  tried && !isPhoneLike(phone)
-                    ? "Enter a valid phone number."
-                    : tried && !phoneVerified
-                      ? "Please verify your phone number."
-                      : null
-                }
-              />
-            </div>
-
-            <div className="sm:col-span-2">
               <OptionCards
                 label="What roles are you hiring?"
                 options={HIRING_ROLE_OPTIONS}
@@ -341,7 +318,7 @@ export default function CompanySignup({ onBack }: CompanySignupProps) {
               />
             </div>
 
-            <div className="flex items-center gap-3 pt-1 sm:col-span-2">
+            <div className="mx-auto flex w-full max-w-sm items-center gap-3 pt-1 sm:col-span-2">
               <button
                 type="button"
                 onClick={() => {

@@ -63,7 +63,7 @@ export function VerifiableField({
           className={`${inputClass} flex-1`}
         />
         {verified ? (
-          <span className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-emerald/10 px-3 text-sm font-semibold text-emerald">
+          <span className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border-[1.5px] border-emerald/20 bg-emerald/10 px-3.5 text-sm font-semibold text-emerald">
             <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.5}>
               <path d="M3 8.5l3.5 3.5L13 5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
@@ -74,8 +74,12 @@ export function VerifiableField({
             type="button"
             onClick={() => setOtpOpen(true)}
             disabled={!canVerify}
-            style={canVerify ? { color: "var(--accent)" } : undefined}
-            className="shrink-0 rounded-lg bg-white px-4 text-sm font-semibold shadow-[0_1px_3px_rgba(0,0,0,0.08)] transition-shadow duration-200 hover:shadow-[0_2px_6px_rgba(0,0,0,0.12)] disabled:cursor-not-allowed disabled:text-mediumgray disabled:shadow-none"
+            style={
+              canVerify
+                ? { color: "var(--accent)", borderColor: "var(--accent)", backgroundColor: "var(--accent-tint)" }
+                : undefined
+            }
+            className="signup-chip-btn shrink-0 rounded-lg bg-white px-4 text-sm font-semibold transition-all duration-200 disabled:cursor-not-allowed disabled:text-mediumgray"
           >
             Verify
           </button>

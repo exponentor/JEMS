@@ -1,17 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import {
-  ArrowLeft,
-  Check,
-  Download,
-  FilePlus2,
-  Loader2,
-  Menu,
-  Trash2,
-} from "lucide-react";
-import { useOpenMobileSidebar } from "@/components/dashboard/student/sidebar-context";
+import { Check, Download, FilePlus2, Loader2, Trash2 } from "lucide-react";
+import DashboardShell, {
+  DashboardContainer,
+} from "@/components/dashboard/student/DashboardShell";
 import ResumeEditor from "./ResumeEditor";
 import ResumePreview from "./ResumePreview";
 import {
@@ -37,8 +30,6 @@ export default function ResumeBuilder({
 }: {
   initialVersions: ResumeVersion[];
 }) {
-  const openMobileSidebar = useOpenMobileSidebar();
-
   const [versions, setVersions] = useState<ResumeVersion[]>(initialVersions);
   const [activeId, setActiveId] = useState(initialVersions[0]?.id ?? "v1");
 
@@ -113,51 +104,34 @@ export default function ResumeBuilder({
   const ats = atsScore(data);
 
   return (
-    <>
-      {/* Top bar */}
-      <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-lightgray bg-white px-4 sm:px-6 lg:px-8">
-        <button
-          type="button"
-          onClick={openMobileSidebar}
-          aria-label="Open menu"
-          className="flex h-9 w-9 items-center justify-center rounded-lg text-navy hover:bg-[#f9fafb] lg:hidden"
-        >
-          <Menu className="h-5 w-5" />
-        </button>
-        <Link
-          href="/student/dashboard"
-          className="flex items-center gap-1.5 text-sm font-medium text-mediumgray transition-colors hover:text-navy"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          <span className="hidden sm:inline">Dashboard</span>
-        </Link>
-        <div className="ml-2 border-l border-lightgray pl-3">
-          <h1 className="text-sm font-bold text-navy">Resume Builder</h1>
-          <p className="hidden text-xs text-mediumgray sm:block">
-            Create ATS-optimized resume
-          </p>
-        </div>
-
-        <div className="ml-auto flex items-center gap-2 text-xs font-medium text-mediumgray">
-          {saving ? (
-            <span className="inline-flex items-center gap-1.5 text-slate">
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              Saving…
-            </span>
-          ) : (
-            <span className="inline-flex items-center gap-1.5 text-emerald">
-              <Check className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">
+    <DashboardShell>
+      <DashboardContainer className="space-y-6">
+        {/* Header */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-navy">
+              Resume Builder
+            </h1>
+            <p className="mt-1 text-sm text-mediumgray">
+              Create ATS-optimized resume
+            </p>
+          </div>
+          <div className="flex items-center gap-2 self-start text-xs font-medium text-mediumgray sm:self-auto">
+            {saving ? (
+              <span className="inline-flex items-center gap-1.5 text-slate">
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                Saving…
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 text-emerald">
+                <Check className="h-3.5 w-3.5" />
                 Saved · {timeAgo(lastSaved)}
               </span>
-              <span className="sm:hidden">Saved</span>
-            </span>
-          )}
+            )}
+          </div>
         </div>
-      </header>
 
-      <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 xl:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
           {/* ── Left: editor ───────────────────────────────── */}
           <div className="space-y-6">
             {/* ATS score */}
@@ -242,7 +216,7 @@ export default function ResumeBuilder({
             </div>
           </div>
         </div>
-      </main>
-    </>
+      </DashboardContainer>
+    </DashboardShell>
   );
 }

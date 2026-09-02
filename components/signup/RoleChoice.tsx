@@ -57,7 +57,7 @@ export default function RoleChoice({ onSelect }: RoleChoiceProps) {
                 "--rc-shadow": shadow,
               } as CSSProperties
             }
-            className="group relative flex flex-col items-start rounded-2xl bg-white p-6 text-left shadow-[0_2px_12px_rgba(0,0,0,0.06)] outline-none transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_20px_44px_var(--rc-shadow)] focus-visible:shadow-[0_20px_44px_var(--rc-shadow)]"
+            className="group relative flex flex-col items-start rounded-2xl border border-lightgray bg-white p-6 text-left shadow-[0_1px_3px_rgba(0,0,0,0.04)] outline-none transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_20px_44px_var(--rc-shadow)] focus-visible:shadow-[0_20px_44px_var(--rc-shadow)]"
           >
             {/* Accent hairline that draws in on hover. */}
             <span

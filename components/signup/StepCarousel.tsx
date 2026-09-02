@@ -16,6 +16,7 @@ export function StepCarousel({
   step: number;
   children: ReactNode[];
 }) {
+  const root = useRef<HTMLDivElement>(null);
   const panels = useRef<(HTMLDivElement | null)[]>([]);
   const [height, setHeight] = useState<number | undefined>(undefined);
 
@@ -30,8 +31,16 @@ export function StepCarousel({
     return () => ro.disconnect();
   }, [step]);
 
+  // Switching steps swaps in different content at the same scroll offset, so
+  // a page scrolled down on step N can land mid-content (heading clipped)
+  // on step N+1. Snap the scroll container back to the top of the new step.
+  useEffect(() => {
+    root.current?.closest(".overflow-y-auto")?.scrollTo({ top: 0, behavior: "auto" });
+  }, [step]);
+
   return (
     <div
+      ref={root}
       className="relative overflow-hidden transition-[height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
       style={{ height }}
     >

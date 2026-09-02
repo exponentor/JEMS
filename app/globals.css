@@ -381,15 +381,38 @@ html {
   --accent-focus: rgba(234, 88, 12, 0.15);
 }
 
-/* Shadows for depth — inputs carry no border, only layered shadow. */
+/* Crisp bordered inputs with a soft resting shadow and a colored focus ring. */
 .signup-input {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 1.5px solid #e5e7eb;
+  box-shadow: 0 1px 2px rgba(17, 24, 39, 0.04);
+}
+.signup-input:hover {
+  border-color: #d1d5db;
 }
 .signup-input:focus {
-  box-shadow: 0 4px 12px var(--accent-focus);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-focus);
 }
 .signup-input[aria-invalid="true"] {
-  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15);
+  border-color: #fca5a5;
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+}
+.signup-input[aria-invalid="true"]:focus {
+  border-color: #ef4444;
+}
+
+/* Secondary "chip" buttons (Verify, Back) — bordered so they read as buttons
+   even resting on the same white card background as everything else. */
+.signup-chip-btn {
+  border: 1.5px solid #e5e7eb;
+  box-shadow: 0 1px 2px rgba(17, 24, 39, 0.04);
+}
+.signup-chip-btn:hover:not(:disabled) {
+  border-color: #d1d5db;
+  box-shadow: 0 2px 6px rgba(17, 24, 39, 0.06);
+}
+.signup-chip-btn:disabled {
+  box-shadow: none;
 }
 
 /* Print only the resume sheet when "Download as PDF" calls window.print(). */
