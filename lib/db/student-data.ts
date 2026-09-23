@@ -1,5 +1,6 @@
 import { ObjectId, type Db, type Document } from "mongodb";
 import { getDatabase } from "@/lib/db/mongodb";
+import { scoreAgainst } from "@/lib/agents/engine";
 
 /** Typed handle to the database (the JS mongodb helper is untyped). */
 async function getDb(): Promise<Db> {
@@ -246,41 +247,51 @@ export interface JobMatchView {
   salary: string;
   posted: string;
   remote: boolean;
+  matched: string[];
+  missing: string[];
 }
 
 /**
- * The student's ranked job matches. Joins candidateMatches → jobPostings so a
- * match carries the live job details and the per-student match score.
+ * The student's ranked opportunities: every open posting scored live by the
+ * Matching Agent against the student's (verified) skills, so a company's new
+ * opening or a freshly passed quiz changes the ranking immediately.
  */
 export async function getJobMatches(userId: string): Promise<JobMatchView[]> {
   if (!ObjectId.isValid(userId)) return [];
   return safe("getJobMatches", [], async () => {
     const db = await getDb();
-    const matches = await db
-      .collection("candidateMatches")
-      .find({ studentId: oid(userId) })
-      .sort({ matchScore: -1 })
-      .toArray();
+    const [profile, jobs] = await Promise.all([
+      db.collection("studentProfiles").findOne({ userId: oid(userId) }),
+      db.collection("jobPostings").find({ status: { $ne: "closed" } }).sort({ postedAt: -1 }).limit(60).toArray(),
+    ]);
+    const skills = (Array.isArray(profile?.skills) ? profile!.skills : [])
+      .map((s: unknown) => {
+        const o = (s ?? {}) as Record<string, unknown>;
+        return { name: str(o.name), level: Number(o.level) || 0, verified: Boolean(o.verified) };
+      })
+      .filter((s: { name: string }) => s.name);
+    if (skills.length === 0) return [];
 
-    const jobs = await jobsByIds(db, toObjectIds(matches.map((m) => m.jobId)));
-
-    const out: JobMatchView[] = [];
-    for (const m of matches) {
-      const job = m.jobId ? jobs.get(m.jobId.toString()) : null;
-      if (!job) continue;
-      out.push({
-        id: job._id.toString(),
-        role: str(job.role) || str(job.title),
-        company: str(job.company),
-        match: Number(m.matchScore) || 0,
-        location: str(job.location),
-        type: str(job.type) || "Full-time",
-        salary: str(job.salary),
-        posted: timeAgo(job.postedAt ?? job.createdAt),
-        remote: Boolean(job.remote),
-      });
-    }
-    return out;
+    return jobs
+      .map((job) => {
+        const required = Array.isArray(job.requiredSkills) ? job.requiredSkills.map(String) : [];
+        const nice = Array.isArray(job.niceToHave) ? job.niceToHave.map(String) : [];
+        const { score, matched, missing } = scoreAgainst(skills, required, nice);
+        return {
+          id: job._id.toString(),
+          role: str(job.role) || str(job.title),
+          company: str(job.company),
+          match: score,
+          location: str(job.location),
+          type: str(job.type) || "Full-time",
+          salary: str(job.salary),
+          posted: timeAgo(job.postedAt ?? job.createdAt),
+          remote: Boolean(job.remote),
+          matched,
+          missing,
+        };
+      })
+      .sort((a, b) => b.match - a.match);
   });
 }
 
@@ -645,17 +656,23 @@ export interface DashboardData {
   skills: SkillView[];
   resumeProgress: number;
   hasResume: boolean;
+  /** Skill questionnaire completed (the "assess first" gate). */
+  assessmentDone: boolean;
+  verifiedSkills: number;
 }
 
 export async function getDashboardData(
   userId: string,
 ): Promise<DashboardData> {
-  const [matches, interviews, progress, resume] = await Promise.all([
+  const [matches, interviews, progress, resume, profileDoc] = await Promise.all([
     getJobMatches(userId),
     getMockInterviews(userId),
     getProgress(userId),
     getStudentResume(userId),
+    (async () => (await getDb()).collection("studentProfiles").findOne({ userId: oid(userId) }))(),
   ]);
+  const assessmentDone = Boolean((profileDoc?.assessment as { questionnaireAt?: unknown } | undefined)?.questionnaireAt);
+  const verifiedSkills = (Array.isArray(profileDoc?.skills) ? profileDoc!.skills : []).filter((s: { verified?: unknown }) => Boolean(s?.verified)).length;
 
   // These two are not covered by a sub-loader, so guard them independently.
   const { upcoming, activity } = await safe(
@@ -708,5 +725,7 @@ export async function getDashboardData(
     skills: progress.skills,
     resumeProgress: hasResume ? 100 : 0,
     hasResume,
+    assessmentDone,
+    verifiedSkills,
   };
 }

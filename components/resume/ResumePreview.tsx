@@ -110,8 +110,12 @@ export default function ResumePreview({ data }: { data: ResumeData }) {
           <SectionTitle>Skills</SectionTitle>
           <div className="flex flex-wrap gap-1.5">
             {skills.map((s) => (
-              <span key={s.id} className="rounded bg-gray-100 px-2 py-0.5 text-[11px] text-gray-700">
-                {s.name}
+              <span
+                key={s.id}
+                title={s.verified ? "Verified by JEMS" : undefined}
+                className={`rounded px-2 py-0.5 text-[11px] ${s.verified ? "bg-emerald-50 text-emerald-800 ring-1 ring-emerald-200" : "bg-gray-100 text-gray-700"}`}
+              >
+                {s.verified ? "✓ " : ""}{s.name}
               </span>
             ))}
           </div>

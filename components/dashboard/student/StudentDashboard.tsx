@@ -13,6 +13,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import DashboardShell, { DashboardContainer } from "./DashboardShell";
+import { Card } from "./ui";
 import { useStudent } from "./StudentContext";
 import type { DashboardData } from "@/lib/db/student-data";
 
@@ -29,17 +30,6 @@ const STAT_META: { Icon: LucideIcon; chip: string }[] = [
   { Icon: Briefcase, chip: "bg-orange/10 text-orange" },
 ];
 
-/** Card shell — subtle border + soft shadow, no gradients. */
-function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return (
-    <div
-      className={`rounded-2xl border border-lightgray bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04)] ${className}`}
-    >
-      {children}
-    </div>
-  );
-}
-
 function SectionHead({
   title,
   action,
@@ -50,7 +40,7 @@ function SectionHead({
   href?: string;
 }) {
   return (
-    <div className="flex items-center justify-between border-b border-lightgray px-5 py-3.5">
+    <div className="flex items-center justify-between border-b border-navy/[0.06] px-5 py-3.5">
       <h2 className="text-sm font-semibold text-navy">{title}</h2>
       {action && href && (
         <Link
@@ -76,10 +66,27 @@ interface NextStep {
 /** Builds a "what to do next" list from what the student is still missing. */
 function buildNextSteps(data: DashboardData): NextStep[] {
   const steps: NextStep[] = [];
+  if (!data.assessmentDone) {
+    steps.push({
+      title: "Complete your skill assessment",
+      desc: "Rate industry skills, then verify them with skill tests",
+      action: "Start",
+      href: "/student/assessment",
+      progress: 0,
+    });
+  } else if (data.verifiedSkills === 0) {
+    steps.push({
+      title: "Verify your first skill",
+      desc: "Pass a skill test so it counts on your resume and in matching",
+      action: "Take test",
+      href: "/student/assessment",
+      progress: 30,
+    });
+  }
   if (!data.hasResume) {
     steps.push({
       title: "Build your resume",
-      desc: "Stand out to employers and unlock job matches",
+      desc: "Import your verified skills and projects in one click",
       action: "Start",
       href: "/student/resume",
       progress: 0,
@@ -151,33 +158,33 @@ export default function StudentDashboard({ data }: { data: DashboardData }) {
         {/* Header */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-navy">
+            <h1 className="font-display text-[1.75rem] font-bold tracking-[-0.02em] text-navy">
               Welcome back, {student.firstName}
             </h1>
             {subtitle && <p className="mt-1 text-sm text-mediumgray">{subtitle}</p>}
           </div>
           <Link
-            href="/student/resume"
-            className="inline-flex items-center justify-center gap-1.5 self-start rounded-lg bg-navy px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#1f2937] sm:self-auto"
+            href="/student/roadmap"
+            className="group inline-flex items-center justify-center gap-1.5 self-start rounded-lg bg-navy px-4 py-2.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-[#1f2937] sm:self-auto"
           >
-            {data.hasResume ? "Continue resume" : "Build resume"}
-            <ArrowUpRight className="h-4 w-4" />
+            Open my roadmap
+            <ArrowUpRight className="h-4 w-4 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
           </Link>
         </div>
 
         {/* Stat tiles */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div data-tour="dashboard-stats" className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {stats.map((s, i) => {
             const meta = STAT_META[i];
             return (
-              <Card key={s.label} className="p-5 transition-shadow hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)]">
+              <Card key={s.label} className="p-5 transition-shadow duration-200 hover:shadow-[var(--shadow-card)]">
                 <div className="flex items-start justify-between">
                   <p className="text-xs font-medium text-mediumgray">{s.label}</p>
                   <span className={`flex h-8 w-8 items-center justify-center rounded-lg ${meta.chip}`}>
                     <meta.Icon className="h-4 w-4" />
                   </span>
                 </div>
-                <p className="mt-3 text-2xl font-bold text-navy">{s.value}</p>
+                <p className="font-display mt-3 text-[1.75rem] font-bold leading-none tracking-tight text-navy tabular">{s.value}</p>
                 <p
                   className={`mt-1 inline-flex items-center gap-1 text-xs font-medium ${
                     s.trend === "up" ? "text-emerald" : "text-mediumgray"
@@ -200,10 +207,10 @@ export default function StudentDashboard({ data }: { data: DashboardData }) {
               <SectionHead title="Your next steps" />
               {nextSteps.length === 0 ? (
                 <p className="px-5 py-8 text-center text-sm text-mediumgray">
-                  You&apos;re all caught up. 🎉
+                  You&apos;re all caught up — nothing is waiting on you.
                 </p>
               ) : (
-                <ul className="divide-y divide-lightgray">
+                <ul className="divide-y divide-navy/[0.06]">
                   {nextSteps.map((step) => (
                     <li key={step.title} className="flex items-center gap-4 px-5 py-4">
                       <div className="min-w-0 flex-1">
@@ -220,7 +227,7 @@ export default function StudentDashboard({ data }: { data: DashboardData }) {
                       </div>
                       <Link
                         href={step.href}
-                        className="shrink-0 rounded-lg border border-lightgray px-3.5 py-2 text-xs font-semibold text-navy transition-colors hover:border-slate hover:text-slate"
+                        className="shrink-0 rounded-lg border border-navy/15 px-3.5 py-2 text-xs font-semibold text-navy transition-colors duration-200 hover:border-orange hover:text-orange"
                       >
                         {step.action}
                       </Link>
@@ -238,10 +245,10 @@ export default function StudentDashboard({ data }: { data: DashboardData }) {
                   No matches yet — complete your resume to get matched with roles.
                 </p>
               ) : (
-                <ul className="divide-y divide-lightgray">
+                <ul className="divide-y divide-navy/[0.06]">
                   {data.jobs.map((job) => (
                     <li key={job.id} className="flex items-center gap-4 px-5 py-4">
-                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#f3f4f6] text-sm font-bold text-navy">
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface text-sm font-bold text-navy">
                         {job.company.charAt(0)}
                       </span>
                       <div className="min-w-0 flex-1">
@@ -251,7 +258,7 @@ export default function StudentDashboard({ data }: { data: DashboardData }) {
                         </p>
                       </div>
                       <span
-                        className={`hidden shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold sm:inline-block ${matchTone(job.match)}`}
+                        className={`hidden shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold tabular sm:inline-block ${matchTone(job.match)}`}
                       >
                         {job.match}% match
                       </span>
@@ -272,7 +279,7 @@ export default function StudentDashboard({ data }: { data: DashboardData }) {
             <Card className="p-5">
               <div className="flex items-center justify-between">
                 <h2 className="text-sm font-semibold text-navy">Profile completion</h2>
-                <span className="text-sm font-bold text-slate">{data.readiness}%</span>
+                <span className="text-sm font-bold text-orange tabular">{data.readiness}%</span>
               </div>
               <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-lightgray">
                 <div
@@ -294,7 +301,7 @@ export default function StudentDashboard({ data }: { data: DashboardData }) {
                   Nothing scheduled yet.
                 </p>
               ) : (
-                <ul className="divide-y divide-lightgray">
+                <ul className="divide-y divide-navy/[0.06]">
                   {data.upcoming.map((item) => (
                     <li key={item.title} className="flex items-start gap-3 px-5 py-3.5">
                       <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate/10 text-slate">
@@ -315,11 +322,11 @@ export default function StudentDashboard({ data }: { data: DashboardData }) {
               <h2 className="text-sm font-semibold text-navy">Your skills</h2>
               {data.skills.length === 0 ? (
                 <p className="mt-3 text-xs text-mediumgray">
-                  Add skills from your{" "}
-                  <Link href="/student/resume" className="font-semibold text-slate">
-                    resume
+                  Take a{" "}
+                  <Link href="/student/assessment" className="font-semibold text-slate">
+                    skill assessment
                   </Link>{" "}
-                  to see them here.
+                  to earn verified skills here.
                 </p>
               ) : (
                 <ul className="mt-3 space-y-3">
@@ -327,7 +334,7 @@ export default function StudentDashboard({ data }: { data: DashboardData }) {
                     <li key={skill.name}>
                       <div className="mb-1 flex items-center justify-between text-xs">
                         <span className="font-medium text-navy">{skill.name}</span>
-                        <span className="text-mediumgray">{skill.level}%</span>
+                        <span className="text-mediumgray tabular">{skill.level}%</span>
                       </div>
                       <div className="h-1.5 w-full overflow-hidden rounded-full bg-lightgray">
                         <div

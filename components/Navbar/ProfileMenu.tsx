@@ -79,7 +79,7 @@ export default function ProfileMenu({
                 item.action();
                 setOpen(false);
               }}
-              className="block w-full px-4 py-2.5 text-left text-sm text-navy transition-colors hover:bg-[#f9fafb] hover:text-slate"
+              className="block w-full px-4 py-2.5 text-left text-sm text-navy transition-colors hover:bg-surface-2 hover:text-slate"
             >
               {item.label}
             </button>

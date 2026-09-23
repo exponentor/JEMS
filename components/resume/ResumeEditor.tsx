@@ -1,11 +1,12 @@
 "use client";
 
+import Link from "next/link";
+import { BadgeCheck, Check } from "lucide-react";
 import { EntryCard, FormSection } from "./FormSection";
 import {
   DeleteButton,
   GripHandle,
   LabeledInput,
-  LabeledSelect,
   LabeledTextarea,
   ReorderableList,
 } from "./fields";
@@ -14,19 +15,40 @@ import {
   blankEducation,
   blankExperience,
   blankProject,
-  blankSkill,
-  PROFICIENCY,
   type ListKey,
   type ProficiencyLevel,
   type ResumeData,
+  uid,
 } from "./types";
+
+export interface VerifiedSkill {
+  name: string;
+  level: number;
+}
 
 interface ResumeEditorProps {
   data: ResumeData;
   setData: (producer: (prev: ResumeData) => ResumeData) => void;
+  /** The student's JEMS-verified skills — the only skills the resume may list. */
+  verifiedSkills?: VerifiedSkill[];
 }
 
-export default function ResumeEditor({ data, setData }: ResumeEditorProps) {
+const levelLabel = (n: number): ProficiencyLevel => (n >= 85 ? "Expert" : n >= 70 ? "Advanced" : n >= 50 ? "Intermediate" : "Beginner");
+
+export default function ResumeEditor({ data, setData, verifiedSkills = [] }: ResumeEditorProps) {
+  /** Skills are a checklist over the student's verified skills — never typed in. */
+  const toggleVerifiedSkill = (vs: VerifiedSkill) =>
+    setData((d) => {
+      const key = vs.name.trim().toLowerCase();
+      const has = d.skills.some((k) => k.name.trim().toLowerCase() === key);
+      return {
+        ...d,
+        skills: has
+          ? d.skills.filter((k) => k.name.trim().toLowerCase() !== key)
+          : [...d.skills, { id: uid("skill"), name: vs.name, level: levelLabel(vs.level), verified: true }],
+      };
+    });
+
   const setHeader = (key: keyof ResumeData["header"], value: string) =>
     setData((d) => ({ ...d, header: { ...d.header, [key]: value } }));
 
@@ -159,37 +181,40 @@ export default function ResumeEditor({ data, setData }: ResumeEditorProps) {
         />
       </FormSection>
 
-      {/* Section 5 — Skills */}
+      {/* Section 5 — Skills (verified only) */}
       <FormSection
         title="Skills"
-        count={`${data.skills.length} skills added`}
-        addLabel="Add Skill"
-        onAdd={() => addItem("skills", blankSkill())}
+        subtitle="Only skills verified by a JEMS assessment can appear on your resume — self-declared skills are not accepted."
+        count={`${data.skills.length} verified skill${data.skills.length === 1 ? "" : "s"} on this resume`}
       >
-        <ReorderableList
-          items={data.skills}
-          getKey={(it) => it.id}
-          onReorder={(next) => reorderList("skills", next)}
-          renderItem={(item, _i, handleProps) => (
-            <EntryCard>
-              <div className="flex items-end gap-3">
-                <GripHandle handleProps={handleProps} />
-                <div className="flex-1">
-                  <LabeledInput label="Skill Name" value={item.name} onChange={(v) => patchItem("skills", item.id, { name: v })} placeholder="React" />
-                </div>
-                <div className="w-40">
-                  <LabeledSelect
-                    label="Proficiency"
-                    value={item.level}
-                    onChange={(v) => patchItem("skills", item.id, { level: v as ProficiencyLevel })}
-                    options={PROFICIENCY}
-                  />
-                </div>
-                <DeleteButton onClick={() => removeItem("skills", item.id)} />
-              </div>
-            </EntryCard>
-          )}
-        />
+        {verifiedSkills.length === 0 ? (
+          <p className="rounded-lg border border-dashed border-lightgray bg-surface-2 p-4 text-sm text-mediumgray">
+            You have no verified skills yet.{" "}
+            <Link href="/student/assessment" className="font-semibold text-slate hover:underline">Take a skill assessment</Link> or pass a roadmap module quiz, then come back to add them here.
+          </p>
+        ) : (
+          <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {verifiedSkills.map((vs) => {
+              const on = data.skills.some((k) => k.name.trim().toLowerCase() === vs.name.trim().toLowerCase());
+              return (
+                <li key={vs.name}>
+                  <button
+                    type="button"
+                    onClick={() => toggleVerifiedSkill(vs)}
+                    aria-pressed={on}
+                    className={`flex w-full items-center gap-3 rounded-lg border p-3 text-left transition-colors ${on ? "border-emerald/40 bg-emerald/5" : "border-lightgray hover:bg-surface-2"}`}
+                  >
+                    <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border ${on ? "border-emerald bg-emerald text-white" : "border-lightgray bg-white"}`}>{on && <Check className="h-3 w-3" />}</span>
+                    <span className="min-w-0 flex-1">
+                      <span className="flex items-center gap-1.5 text-sm font-medium text-navy">{vs.name}<BadgeCheck className="h-3.5 w-3.5 text-emerald" /></span>
+                      <span className="text-[11px] text-mediumgray">Verified · {levelLabel(vs.level)}</span>
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </FormSection>
 
       {/* Section 6 — Certifications */}

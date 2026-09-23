@@ -40,7 +40,7 @@ export default function StudentShell({
   return (
     <SidebarPinnedProvider value={sidebarPinned}>
       <OpenMobileSidebarProvider value={() => setSidebarOpen(true)}>
-        <div className="min-h-screen bg-[#f1f5f9]">
+        <div className="min-h-screen bg-surface">
           <Sidebar
             open={sidebarOpen}
             onClose={() => setSidebarOpen(false)}

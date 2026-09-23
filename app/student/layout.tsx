@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import StudentShell from "@/components/dashboard/student/StudentShell";
 import { StudentProvider } from "@/components/dashboard/student/StudentContext";
 import { getStudentView } from "@/lib/student";
+import { HOME_BY_ROLE } from "@/lib/auth/require-role";
 
 /**
  * Auth boundary for the whole student area. Every `/student/*` page requires a
@@ -16,6 +17,7 @@ export default async function StudentLayout({
 }) {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
+  if (session.user.role !== "student") redirect(HOME_BY_ROLE[session.user.role] ?? "/login");
 
   const student = await getStudentView(session.user.id);
   if (!student) redirect("/login");

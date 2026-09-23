@@ -1,84 +1,117 @@
 "use client";
 
-import { Eyebrow, revealClass, useReveal } from "./_shared";
+import { ArrowUpRight, BadgeCheck, FileText, Mic, Route, Target } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { SectionHeading, revealClass, useReveal } from "./_shared";
 
 interface Feature {
-  num: string;
+  Icon: LucideIcon;
   title: string;
   desc: string;
-  accent: string;
+  /** Grid placement classes for the bento. */
+  span: string;
+  featured?: boolean;
 }
 
 const features: Feature[] = [
   {
-    num: "01",
-    title: "ATS-Optimized Resume",
-    desc: "Build resumes that pass ATS systems and catch recruiter attention. One-click optimization.",
-    accent: "text-orange",
+    Icon: BadgeCheck,
+    title: "Assessment-verified skills",
+    desc: "Skills proven by tests, projects and faculty approval — not just certificates. Verified abilities flow into your portfolio, roadmap and every job match, so employers see evidence, not claims.",
+    span: "sm:col-span-2 lg:col-span-3 lg:row-span-2",
+    featured: true,
   },
   {
-    num: "02",
-    title: "AI Mock Interviews",
-    desc: "Practice real interviews. Get feedback on clarity, confidence, technical accuracy. Interview-ready in weeks.",
-    accent: "text-slate",
+    Icon: Route,
+    title: "Personalised AI roadmap",
+    desc: "Learning path built around your interests and career goals. AI identifies gaps and suggests courses, certifications and projects to close them.",
+    span: "lg:col-span-3",
   },
   {
-    num: "03",
-    title: "Smart Job Matching",
-    desc: "Find opportunities that fit YOUR skills. See match scores. Know exactly what to learn to land them.",
-    accent: "text-orange",
+    Icon: Target,
+    title: "AI job & internship matching",
+    desc: "Ranked matches with clear reasons. AI reads job posts in plain words, parses requirements, and shows you which skills matter most.",
+    span: "lg:col-span-3",
   },
   {
-    num: "04",
-    title: "Personalized Learning",
-    desc: "Learn in YOUR style. Visual, hands-on, example-based — AI adapts to how you learn best.",
-    accent: "text-slate",
+    Icon: FileText,
+    title: "Verified portfolio",
+    desc: "Central record of all your verified skills, activities, projects and achievements. One source of truth for internship and job applications.",
+    span: "lg:col-span-3",
+  },
+  {
+    Icon: Mic,
+    title: "Activity tracker & dashboards",
+    desc: "Live dashboard of marks, attendance, seminars, MOOCs and internships. Upload proof, faculty approve it, and watch your credits accumulate toward AICTE requirements.",
+    span: "lg:col-span-3",
   },
 ];
 
-/** Features — four core tools, shown only to unauthenticated visitors. */
+/** Features — the core tools, shown only to unauthenticated visitors. */
 export default function Features() {
   const { ref, visible } = useReveal<HTMLElement>();
   const r = revealClass(visible);
 
   return (
     <section id="features" ref={ref} className="bg-transparent">
-      <div className="mx-auto max-w-7xl px-4 py-2 sm:px-6 lg:px-8 lg:py-12">
-        <div className={`max-w-2xl ${r}`}>
-          <Eyebrow>What You Get</Eyebrow>
-          <h2 className="mt-8 text-3xl font-extrabold tracking-tight text-navy sm:text-4xl">
-            Everything You Need to Get Hired
-          </h2>
-          <p className="mt-4 text-lg leading-8 text-mediumgray">
-            All the tools to close the gap.
-          </p>
-        </div>
+      <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+        <SectionHeading
+          className={r}
+          title="A unified platform for students, faculty, industry and institutions"
+          lede="Assessment-verified skills, personalised AI roadmaps, easy job matching, and live dashboards — all connected. Records, skills, learning and jobs in one place."
+        />
 
-        {/* Thin-divider grid (gap-px on a light-gray container) — premium,
-            no heavy card chrome. */}
-        <div className="mt-14 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-lightgray bg-lightgray sm:grid-cols-2">
+        <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
           {features.map((f, i) => (
-            <div
-              key={f.num}
-              style={{ transitionDelay: visible ? `${i * 120 + 120}ms` : "0ms" }}
-              className={`h-full ${r}`}
+            <article
+              key={f.title}
+              style={{ transitionDelay: visible ? `${i * 90 + 100}ms` : "0ms" }}
+              className={`group relative flex flex-col overflow-hidden rounded-3xl transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 ${f.span} ${r} ${
+                f.featured
+                  ? "bg-navy p-8 text-white shadow-[var(--shadow-card)] sm:p-10"
+                  : "border border-navy/[0.07] bg-white p-7 shadow-[var(--shadow-soft)] hover:shadow-[var(--shadow-card)]"
+              }`}
             >
-              <article className="group flex h-full flex-col bg-white/90 p-8 backdrop-blur-sm transition-colors hover:bg-white sm:p-10">
-                <span className={`text-sm font-bold tracking-widest ${f.accent}`}>
-                  {f.num}
-                </span>
-                <h3 className="mt-4 text-xl font-bold text-navy">{f.title}</h3>
-                <p className="mt-3 text-sm leading-7 text-mediumgray">
-                  {f.desc}
-                </p>
+              {f.featured && (
+                <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+                  <div className="absolute -right-20 -top-24 h-72 w-72 rounded-full bg-orange/30 blur-3xl" />
+                  <div className="absolute -bottom-24 -left-10 h-56 w-56 rounded-full bg-gold/20 blur-3xl" />
+                </div>
+              )}
+
+              <span
+                className={`relative flex h-11 w-11 items-center justify-center rounded-xl ${
+                  f.featured ? "bg-white/10 text-white ring-1 ring-white/15" : "bg-orange/10 text-orange"
+                }`}
+              >
+                <f.Icon className="h-5 w-5" strokeWidth={2} />
+              </span>
+
+              <h3
+                className={`font-display relative mt-6 font-bold tracking-tight ${
+                  f.featured ? "text-3xl leading-tight sm:text-4xl" : "text-xl"
+                }`}
+              >
+                {f.title}
+              </h3>
+              <p
+                className={`relative mt-3 max-w-[48ch] leading-7 ${
+                  f.featured ? "text-base text-white/75 sm:text-lg sm:leading-8" : "text-[15px] text-ink-soft"
+                }`}
+              >
+                {f.desc}
+              </p>
+
+              {f.featured && (
                 <a
                   href="#get-started"
-                  className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-orange opacity-70 transition-opacity group-hover:opacity-100"
+                  className="relative mt-auto inline-flex items-center gap-1.5 self-start pt-10 text-sm font-semibold text-white"
                 >
-                  Explore <span aria-hidden="true">→</span>
+                  Start with a free assessment
+                  <ArrowUpRight className="h-4 w-4 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                 </a>
-              </article>
-            </div>
+              )}
+            </article>
           ))}
         </div>
       </div>

@@ -145,7 +145,7 @@ export function PasswordField({
                 className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors ${
                   c.ok
                     ? "bg-emerald/10 text-emerald"
-                    : "bg-[#f3f4f6] text-mediumgray"
+                    : "bg-surface text-mediumgray"
                 }`}
               >
                 <span aria-hidden="true" className="text-[9px]">

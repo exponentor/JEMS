@@ -72,7 +72,7 @@ export default function CareersPage() {
               <li key={role.title}>
                 <Link
                   href="/contact"
-                  className="group flex flex-col gap-2 px-6 py-5 transition-colors hover:bg-[#f9fafb] sm:flex-row sm:items-center sm:justify-between"
+                  className="group flex flex-col gap-2 px-6 py-5 transition-colors hover:bg-surface-2 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div>
                     <p className="text-base font-bold text-navy transition-colors group-hover:text-slate">

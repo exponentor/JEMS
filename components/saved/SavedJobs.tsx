@@ -45,7 +45,7 @@ export default function SavedJobs({ saved }: { saved: SavedJobView[] }) {
             <div className="space-y-4">
               {jobs.map((j) => (
                 <Card key={j.id} className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
-                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#f1f5f9] text-base font-bold text-navy">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-surface text-base font-bold text-navy">
                     {j.company.charAt(0)}
                   </span>
                   <div className="min-w-0 flex-1">

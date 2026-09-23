@@ -39,11 +39,11 @@ function NavList({
       <ul className="space-y-1">
         {items.map((item) => {
           const Icon = item.icon;
-          const isActive = !!item.href && pathname === item.href;
+          const isActive = !!item.href && (pathname === item.href || pathname.startsWith(item.href + "/"));
           const cls = `group/item flex items-center gap-3 rounded-xl px-3 py-2 text-[13px] font-medium transition-all ${justifyClass(pinned)} ${
             isActive
-              ? "bg-cta-gradient text-white shadow-[0_4px_12px_rgba(234,88,12,0.3)]"
-              : "text-[#475569] hover:bg-[#f1f5f9] hover:text-navy"
+              ? "bg-orange/10 text-orange"
+              : "text-ink-soft hover:bg-surface hover:text-navy"
           }`;
           const inner = (
             <>
@@ -57,7 +57,7 @@ function NavList({
           return (
             <li key={item.label}>
               {item.href ? (
-                <Link href={item.href} onClick={onNavigate} className={cls}>
+                <Link href={item.href} onClick={onNavigate} aria-current={isActive ? "page" : undefined} className={cls}>
                   {inner}
                 </Link>
               ) : (
@@ -107,12 +107,13 @@ export default function Sidebar({
       )}
 
       <aside
-        className={`group fixed inset-y-0 left-0 z-50 flex h-screen w-60 flex-col overflow-hidden border-r border-lightgray bg-white transition-[width,transform,box-shadow] duration-300 ease-in-out ${
+        data-tour="sidebar"
+        className={`group fixed inset-y-0 left-0 z-50 flex h-screen w-60 flex-col overflow-hidden border-r border-navy/[0.06] bg-white transition-[width,transform,box-shadow] duration-300 ease-in-out ${
           open ? "translate-x-0" : "-translate-x-full"
         } lg:translate-x-0 ${
           pinned
             ? "lg:w-60"
-            : "lg:w-16 lg:hover:w-60 lg:hover:shadow-[10px_0_40px_rgba(17,24,39,0.07)]"
+            : "lg:w-16 lg:hover:w-60 lg:hover:shadow-[12px_0_40px_-8px_rgba(17,24,39,0.12)]"
         }`}
       >
         {/* User card */}
@@ -130,7 +131,7 @@ export default function Sidebar({
               onClick={onTogglePinned}
               aria-label={pinned ? "Collapse sidebar" : "Keep sidebar open"}
               aria-pressed={pinned}
-              className={`${revealClass(pinned)} ml-auto shrink-0 rounded-lg p-1.5 text-mediumgray transition-colors hover:bg-[#f1f5f9] hover:text-navy`}
+              className={`${revealClass(pinned)} ml-auto shrink-0 rounded-lg p-1.5 text-mediumgray transition-colors hover:bg-surface hover:text-navy`}
             >
               {pinned ? (
                 <PanelLeftClose className="h-5 w-5" />
@@ -141,7 +142,7 @@ export default function Sidebar({
           </div>
         </div>
 
-        <div className="mx-3 my-2 h-px bg-lightgray" />
+        <div className="mx-3 my-2 h-px bg-navy/[0.06]" />
 
         {/* Nav */}
         <nav className="flex-1 space-y-4 overflow-y-auto px-2.5 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">

@@ -1,17 +1,22 @@
-import type { ComponentType, ReactNode } from "react";
+import type { ComponentType, HTMLAttributes, ReactNode, Ref } from "react";
 import Link from "next/link";
 
 /** Standard dashboard surface — soft border + subtle shadow, no gradients. */
 export function Card({
   children,
   className = "",
+  ref,
+  ...rest
 }: {
   children: ReactNode;
   className?: string;
-}) {
+  ref?: Ref<HTMLDivElement>;
+} & Omit<HTMLAttributes<HTMLDivElement>, "className" | "children">) {
   return (
     <div
-      className={`rounded-2xl border border-lightgray bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04)] ${className}`}
+      ref={ref}
+      {...rest}
+      className={`rounded-2xl border border-navy/[0.06] bg-white shadow-[var(--shadow-soft)] ${className}`}
     >
       {children}
     </div>
@@ -59,15 +64,15 @@ export function EmptyState({
 }) {
   return (
     <Card className="flex flex-col items-center justify-center px-6 py-16 text-center">
-      <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate/10 text-slate">
+      <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-orange/10 text-orange">
         <Icon className="h-7 w-7" />
       </span>
-      <p className="mt-4 text-base font-semibold text-navy">{title}</p>
+      <p className="font-display mt-4 text-lg font-bold tracking-tight text-navy">{title}</p>
       <p className="mt-1 max-w-sm text-sm text-mediumgray">{hint}</p>
       {ctaLabel && ctaHref && (
         <Link
           href={ctaHref}
-          className="mt-5 inline-flex items-center justify-center rounded-lg bg-primary-gradient px-5 py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(234,88,12,0.25)] transition-transform hover:-translate-y-0.5"
+          className="mt-5 inline-flex items-center justify-center rounded-lg bg-primary-gradient px-5 py-2.5 text-sm font-semibold text-white shadow-[var(--shadow-cta)] transition-transform duration-200 hover:-translate-y-0.5 active:translate-y-0"
         >
           {ctaLabel}
         </Link>

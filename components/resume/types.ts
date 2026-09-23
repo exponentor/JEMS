@@ -39,6 +39,18 @@ export interface SkillItem {
   id: string;
   name: string;
   level: ProficiencyLevel;
+  /** Earned by passing a JEMS roadmap quiz (graded server-side). */
+  verified?: boolean;
+}
+
+/**
+ * What the platform has verified about the student — offered to the builder
+ * as a one-click import so the resume reflects the digital portfolio.
+ */
+export interface JemsImport {
+  skills: { name: string; level: number; verified: boolean }[];
+  certificates: { id: string; title: string; issuer: string; issuedAt: string }[];
+  projects: { id: string; title: string; description: string; tech: string[] }[];
 }
 
 export interface CertItem {

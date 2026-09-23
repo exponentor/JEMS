@@ -25,6 +25,16 @@ async function setupDatabase() {
       'resumes',
       'mockInterviews',
       'learningPaths',
+      'roadmapProgress',
+      'lessonVideos',
+      'studentAnalyses',
+      'skillTestSessions',
+      'skillAssessments',
+      'industryPrograms',
+      'collaborations',
+      'collaborationInterests',
+      'institutionProfiles',
+      'facultyProfiles',
       'jobPostings',
       'jobApplications',
       'savedJobs',
@@ -36,6 +46,7 @@ async function setupDatabase() {
       'notifications',
       'feedback',
       'passwordResets',
+      'signupOtps',
     ];
 
     console.log('\n✓ Creating collections...');
@@ -92,6 +103,28 @@ async function setupDatabase() {
     await db.collection('learningPaths').createIndex({ studentId: 1 });
     console.log('  ✓ learningPaths');
 
+    // Roadmap: one progress doc per student per career path; lesson cache keyed by lesson.
+    await db.collection('roadmapProgress').createIndex({ studentId: 1, careerPath: 1 }, { unique: true });
+    console.log('  ✓ roadmapProgress');
+
+    await db.collection('lessonVideos').createIndex({ cacheKey: 1 }, { unique: true });
+    console.log('  ✓ lessonVideos');
+
+    // Multi-role prototype: AI analyses, industry programs, academia collaborations.
+    await db.collection('studentAnalyses').createIndex({ studentId: 1 }, { unique: true });
+    console.log('  ✓ studentAnalyses');
+    // Skill tests: sessions expire on their own; one result per (student, skill).
+    await db.collection('skillTestSessions').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 3600 });
+    await db.collection('skillAssessments').createIndex({ studentId: 1, skill: 1 }, { unique: true });
+    console.log('  ✓ skill assessments');
+    await db.collection('industryPrograms').createIndex({ companyId: 1 });
+    await db.collection('collaborations').createIndex({ type: 1 });
+    await db.collection('collaborationInterests').createIndex({ userId: 1, collaborationId: 1 }, { unique: true });
+    await db.collection('institutionProfiles').createIndex({ userId: 1 }, { unique: true });
+    await db.collection('facultyProfiles').createIndex({ userId: 1 }, { unique: true });
+    await db.collection('jobPostings').createIndex({ requiredSkills: 1 });
+    console.log('  ✓ platform collections');
+
     await db.collection('scheduledInterviews').createIndex({ studentId: 1 });
     console.log('  ✓ scheduledInterviews');
 
@@ -105,6 +138,11 @@ async function setupDatabase() {
     // TTL cleanup: Mongo drops the doc once expiresAt (OTP or, once verified, reset-token expiry) is in the past.
     await db.collection('passwordResets').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
     console.log('  ✓ passwordResets');
+
+    await db.collection('signupOtps').createIndex({ email: 1 }, { unique: true });
+    // TTL cleanup: Mongo drops the doc once expiresAt (OTP expiry) is in the past.
+    await db.collection('signupOtps').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+    console.log('  ✓ signupOtps');
 
     console.log('\n✓✓✓ Database setup complete! ✓✓✓');
 

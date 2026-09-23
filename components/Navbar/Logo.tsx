@@ -17,7 +17,7 @@ export default function Logo({ onClick, className = "h-9" }: LogoProps) {
       href="/"
       onClick={onClick}
       aria-label="Jems home"
-      className="inline-flex select-none items-center bg-white p-1.5 border-none rounded-b-full transition-opacity"
+      className="inline-flex select-none items-center rounded-lg transition-opacity hover:opacity-80"
     >
       <Image
         src="/logo.png"

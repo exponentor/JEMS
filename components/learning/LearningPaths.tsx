@@ -59,8 +59,8 @@ export default function LearningPaths({ paths }: { paths: LearningPathView[] }) 
             icon={Layers}
             title="No learning paths yet"
             hint="Tell us your target role and we'll recommend a structured learning path to close your skill gaps. Your enrolled paths will live here."
-            ctaLabel="Set your target role"
-            ctaHref="/student/profile"
+            ctaLabel="Build my roadmap"
+            ctaHref="/student/roadmap"
           />
         </DashboardContainer>
       </DashboardShell>
@@ -139,7 +139,7 @@ export default function LearningPaths({ paths }: { paths: LearningPathView[] }) 
                 <p className="text-xs text-mediumgray">{p.category}</p>
 
                 <div className="mt-3 flex items-center gap-3 text-xs text-mediumgray">
-                  <span className="rounded-md bg-[#f1f5f9] px-2 py-0.5 font-medium text-navy">{p.level}</span>
+                  <span className="rounded-md bg-surface px-2 py-0.5 font-medium text-navy">{p.level}</span>
                   <span>{p.lessons} lessons</span>
                   <span className="inline-flex items-center gap-1">
                     <Clock className="h-3.5 w-3.5" />

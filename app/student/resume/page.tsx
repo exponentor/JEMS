@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import ResumeBuilder from "@/components/resume/ResumeBuilder";
+import { emptyResume, type JemsImport, type ResumeVersion } from "@/components/resume/types";
+import { getPortfolio } from "@/lib/db/portfolio";
 import { getStudentProfile, getStudentResume } from "@/lib/db/student-data";
-import { emptyResume, type ResumeVersion } from "@/components/resume/types";
 
 export const metadata: Metadata = {
   title: "Resume Builder — Jems",
@@ -14,9 +15,10 @@ export default async function StudentResumePage() {
   if (!session?.user?.id) redirect("/login");
   const userId = session.user.id;
 
-  const [resume, profile] = await Promise.all([
+  const [resume, profile, portfolio] = await Promise.all([
     getStudentResume(userId),
     getStudentProfile(userId),
+    getPortfolio(userId),
   ]);
 
   let versions: ResumeVersion[];
@@ -42,5 +44,12 @@ export default async function StudentResumePage() {
     versions = [{ id: "v1", name: "Resume v1", data: seed }];
   }
 
-  return <ResumeBuilder initialVersions={versions} />;
+  // Everything the platform has verified, offered as a one-click import.
+  const jems: JemsImport = {
+    skills: portfolio?.skills ?? [],
+    certificates: (portfolio?.certificates ?? []).map((c) => ({ id: c.id, title: c.title, issuer: c.issuer, issuedAt: c.issuedAt })),
+    projects: (portfolio?.projects ?? []).filter((p) => p.source === "roadmap").map((p) => ({ id: p.id, title: p.title, description: p.description, tech: p.tech })),
+  };
+
+  return <ResumeBuilder initialVersions={versions} jems={jems} />;
 }

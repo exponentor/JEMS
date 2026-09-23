@@ -112,7 +112,7 @@ export default function HelpCenter() {
                 <li key={a}>
                   <button
                     type="button"
-                    className="flex w-full items-center justify-between gap-3 px-5 py-3.5 text-left text-sm text-navy transition-colors hover:bg-[#f8fafc]"
+                    className="flex w-full items-center justify-between gap-3 px-5 py-3.5 text-left text-sm text-navy transition-colors hover:bg-surface-2"
                   >
                     {a}
                     <ChevronDown className="h-4 w-4 -rotate-90 text-mediumgray" />

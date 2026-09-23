@@ -68,7 +68,7 @@ export default function MobileMenu({
             type="button"
             onClick={onClose}
             aria-label="Close menu"
-            className="flex h-10 w-10 items-center justify-center rounded-lg text-navy transition-colors hover:bg-[#f9fafb]"
+            className="flex h-10 w-10 items-center justify-center rounded-lg text-navy transition-colors hover:bg-surface-2"
           >
             <CloseIcon />
           </button>
@@ -87,7 +87,7 @@ export default function MobileMenu({
                       onClick={() =>
                         setExpanded(isOpen ? null : group.label)
                       }
-                      className="flex w-full items-center justify-between rounded-lg px-4 py-3 text-base font-semibold text-navy transition-colors hover:bg-[#f9fafb]"
+                      className="flex w-full items-center justify-between rounded-lg px-4 py-3 text-base font-semibold text-navy transition-colors hover:bg-surface-2"
                     >
                       {group.label}
                       <ChevronDownIcon
@@ -103,7 +103,7 @@ export default function MobileMenu({
                             <button
                               type="button"
                               onClick={() => go(item.href)}
-                              className="flex w-full flex-col items-start rounded-lg px-3 py-2 text-left transition-colors hover:bg-[#f9fafb]"
+                              className="flex w-full flex-col items-start rounded-lg px-3 py-2 text-left transition-colors hover:bg-surface-2"
                             >
                               <span className="text-sm font-medium text-navy">
                                 {item.title}
@@ -127,7 +127,7 @@ export default function MobileMenu({
                   <Link
                     href={link.href}
                     onClick={onClose}
-                    className="block w-full rounded-lg px-4 py-3 text-left text-base font-medium text-navy transition-colors hover:bg-[#f9fafb]"
+                    className="block w-full rounded-lg px-4 py-3 text-left text-base font-medium text-navy transition-colors hover:bg-surface-2"
                   >
                     {link.label}
                   </Link>
@@ -143,14 +143,14 @@ export default function MobileMenu({
               <button
                 type="button"
                 onClick={() => go("/profile")}
-                className="w-full rounded-lg px-4 py-3 text-left text-sm font-medium text-navy transition-colors hover:bg-[#f9fafb]"
+                className="w-full rounded-lg px-4 py-3 text-left text-sm font-medium text-navy transition-colors hover:bg-surface-2"
               >
                 View Profile
               </button>
               <button
                 type="button"
                 onClick={() => go("/settings")}
-                className="w-full rounded-lg px-4 py-3 text-left text-sm font-medium text-navy transition-colors hover:bg-[#f9fafb]"
+                className="w-full rounded-lg px-4 py-3 text-left text-sm font-medium text-navy transition-colors hover:bg-surface-2"
               >
                 Account Settings
               </button>
@@ -170,7 +170,7 @@ export default function MobileMenu({
               <Link
                 href="/login"
                 onClick={onClose}
-                className="w-full rounded-full border border-lightgray px-5 py-3 text-center text-sm font-semibold text-navy transition-colors hover:bg-[#f9fafb]"
+                className="w-full rounded-full border border-lightgray px-5 py-3 text-center text-sm font-semibold text-navy transition-colors hover:bg-surface-2"
               >
                 Log in
               </Link>

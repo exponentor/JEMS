@@ -1,146 +1,110 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { SectionHeading, revealClass, useReveal } from "./_shared";
 
 interface Step {
   num: string;
   title: string;
   desc: string;
-  /** Node tone — progresses from slate (start) to orange (goal). */
-  tone: "slate" | "orange";
   final?: boolean;
 }
 
 const steps: Step[] = [
   {
-    num: "01",
-    title: "Learn Your Way",
-    desc: "AI adapts to your learning style. Examples, visuals, hands-on — whatever works for you.",
-    tone: "slate",
+    num: "1",
+    title: "Companies post requirements",
+    desc: "Industry partners post jobs and internships in plain words. AI parses the requirements automatically.",
   },
   {
-    num: "02",
-    title: "Master the Skills",
-    desc: "Get an ATS-optimized resume. Practice real interviews. Get AI feedback like actual recruiters.",
-    tone: "slate",
+    num: "2",
+    title: "Students add their skills",
+    desc: "Upload activities, certificates, MOOCs, projects and internships. Faculty approve each record.",
   },
   {
-    num: "03",
-    title: "Get Matched",
-    desc: "Find jobs that fit YOU. See match percentages. Know what skills to learn.",
-    tone: "orange",
+    num: "3",
+    title: "Skill gaps identified",
+    desc: "AI compares verified skills against job requirements and shows exactly what's missing.",
   },
   {
-    num: "04",
-    title: "Land the Job",
-    desc: "Interview. Negotiate. Celebrate your new role.",
-    tone: "orange",
+    num: "4",
+    title: "AI roadmap generated",
+    desc: "Personalised learning path built around gaps and career goals. Courses and projects suggested.",
+  },
+  {
+    num: "5",
+    title: "Skills verified by platform",
+    desc: "Complete assessments, projects and faculty reviews. Skills become verified proof.",
+  },
+  {
+    num: "6",
+    title: "AI job & internship matching",
+    desc: "Ranked matches with clear reasons. Companies get verified shortlists in seconds.",
+  },
+  {
+    num: "7",
+    title: "Student gets job / internship",
+    desc: "Apply with verified skills and proven ability. Internship or job offer landed.",
     final: true,
   },
 ];
 
-function nodeClasses(step: Step): string {
-  if (step.final) {
-    return "border-transparent bg-cta-gradient text-white shadow-[var(--shadow-cta)]";
-  }
-  return step.tone === "orange"
-    ? "border-orange bg-white text-orange"
-    : "border-slate bg-white text-slate";
-}
-
 /**
- * How It Works — shown only to unauthenticated visitors below the problem
- * section. A connected journey timeline (horizontal on desktop, vertical on
- * mobile) rather than cards, to convey progression from learning to hired.
+ * How It Works — a connected journey timeline (horizontal on desktop,
+ * vertical on mobile). The step numbers are the sequence, so they stay.
  */
 export default function HowItWorks() {
-  const ref = useRef<HTMLElement>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0]?.isIntersecting) {
-          setVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.15 },
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  const reveal = `transition-all duration-700 ease-out motion-reduce:transition-none ${
-    visible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
-  }`;
+  const { ref, visible } = useReveal<HTMLElement>();
+  const r = revealClass(visible);
 
   return (
     <section id="how-it-works" ref={ref} className="bg-transparent">
-      <div className="mx-auto max-w-7xl px-4 py-1 sm:px-6 sm:py-16 lg:px-8">
-        {/* Header — centered dash-line eyebrow */}
-        <div className={`mx-auto max-w-2xl text-center ${reveal}`}>
-          <div className="flex items-center mb-11 justify-center gap-3">
-            <span aria-hidden="true" className="h-px w-8 bg-orange" />
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-orange">
-              The Journey
-            </span>
-            <span aria-hidden="true" className="h-px w-8 bg-orange" />
-          </div>
-          <h2 className="mt-5 text-3xl font-extrabold tracking-tight text-navy sm:text-4xl">
-            From Learning to Landing Your Dream Job
-          </h2>
-          <p className="mt-4 text-lg leading-8 text-mediumgray">
-            Four simple steps to close the gap.
-          </p>
-        </div>
+      <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+        <SectionHeading
+          className={r}
+          align="center"
+          title="How JEMS Works"
+          lede="Seven-step flow: from company requirements to verified student matches and job offers."
+        />
 
         {/* Timeline */}
-        <ol className="relative mt-12 grid grid-cols-1 gap-10 md:grid-cols-4 md:gap-6">
+        <ol className="relative mt-16 grid grid-cols-1 gap-10 md:grid-cols-7 md:gap-2">
           {/* Connector line — vertical on mobile, horizontal on desktop */}
           <div
             aria-hidden="true"
-            className="absolute left-6 top-6 bottom-6 w-px bg-gradient-to-b from-slate to-orange md:left-[12.5%] md:right-[12.5%] md:top-6 md:bottom-auto md:h-px md:w-auto md:bg-gradient-to-r"
+            className="absolute bottom-6 left-6 top-6 w-px bg-gradient-to-b from-navy/15 via-orange/60 to-orange md:bottom-auto md:left-6 md:right-6 md:top-6 md:h-px md:w-auto md:bg-gradient-to-r"
           />
 
           {steps.map((step, i) => (
             <li
               key={step.num}
-              style={{ transitionDelay: visible ? `${i * 140 + 120}ms` : "0ms" }}
-              className={`relative flex items-start gap-5 md:flex-col md:items-center md:gap-0 md:text-center ${reveal}`}
+              style={{ transitionDelay: visible ? `${i * 130 + 120}ms` : "0ms" }}
+              className={`relative flex items-start gap-5 md:flex-col md:items-center md:gap-0 md:text-center ${r}`}
             >
-              {/* Node */}
               <div
-                className={`relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 text-base font-bold ${nodeClasses(
-                  step,
-                )}`}
+                className={`font-display relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border text-lg font-bold tabular ${
+                  step.final
+                    ? "border-transparent bg-cta-gradient text-white shadow-[var(--shadow-cta)]"
+                    : "border-navy/15 bg-white text-navy"
+                }`}
               >
                 {step.num}
               </div>
 
-              {/* Content */}
               <div className="md:mt-6 md:px-2">
-                <h3 className="text-lg font-bold text-navy">{step.title}</h3>
-                <p className="mt-2 text-sm leading-7 text-mediumgray">
-                  {step.desc}
-                </p>
+                <h3 className="font-display text-xl font-bold tracking-tight text-navy">{step.title}</h3>
+                <p className="mt-2 max-w-[30ch] text-[15px] leading-7 text-ink-soft md:mx-auto">{step.desc}</p>
               </div>
             </li>
           ))}
         </ol>
 
-        {/* Bottom stat */}
-        <div
-          style={{ transitionDelay: visible ? "720ms" : "0ms" }}
-          className={`mt-16 flex justify-center ${reveal}`}
+        <p
+          style={{ transitionDelay: visible ? "700ms" : "0ms" }}
+          className={`mx-auto mt-16 max-w-md text-center text-base text-ink-soft ${r}`}
         >
-          <p className="inline-flex items-center gap-2 rounded-full border border-emerald/30 bg-emerald/5 px-5 py-2.5 text-sm font-medium text-navy">
-            <span className="text-base font-extrabold text-emerald">85%</span>
-            land jobs within 3–4 months
-          </p>
-        </div>
+          <span className="font-display text-3xl font-bold text-orange tabular">100%</span>
+          <span className="mt-1 block">verified skill matches. One central record. Easy hiring for all.</span>
+        </p>
       </div>
     </section>
   );

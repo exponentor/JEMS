@@ -15,9 +15,9 @@ const ROLES = [
     title: "I'm a Student",
     subtitle: "Build job-ready skills and land the role you want.",
     perks: ["Personalized learning", "Mock interviews", "Smart job matches"],
-    accent: "#6366f1",
-    tint: "#eef2ff",
-    shadow: "rgba(99, 102, 241, 0.28)",
+    accent: "#ea580c",
+    tint: "#fff3e6",
+    shadow: "rgba(234, 88, 12, 0.24)",
   },
   {
     role: "company" as const,
@@ -25,9 +25,9 @@ const ROLES = [
     title: "I'm a Company",
     subtitle: "Find and hire pre-screened, skill-matched talent.",
     perks: ["Vetted candidates", "Smart matching", "Faster hiring"],
-    accent: "#ea580c",
-    tint: "#fff3e6",
-    shadow: "rgba(234, 88, 12, 0.28)",
+    accent: "#111827",
+    tint: "#f5f2ec",
+    shadow: "rgba(17, 24, 39, 0.2)",
   },
 ];
 
@@ -36,7 +36,7 @@ export default function RoleChoice({ onSelect }: RoleChoiceProps) {
   return (
     <div style={{ animation: "fade-in 0.3s ease-out" }}>
       <div className="text-center">
-        <h1 className="text-3xl font-bold tracking-tight text-navy">
+        <h1 className="font-display text-4xl font-bold tracking-[-0.025em] text-navy">
           Create your account
         </h1>
         <p className="mt-2 text-[15px] text-mediumgray">
@@ -57,7 +57,7 @@ export default function RoleChoice({ onSelect }: RoleChoiceProps) {
                 "--rc-shadow": shadow,
               } as CSSProperties
             }
-            className="group relative flex flex-col items-start rounded-2xl bg-white p-6 text-left shadow-[0_2px_12px_rgba(0,0,0,0.06)] outline-none transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_20px_44px_var(--rc-shadow)] focus-visible:shadow-[0_20px_44px_var(--rc-shadow)]"
+            className="group relative flex flex-col items-start rounded-2xl border border-lightgray bg-white p-6 text-left shadow-[0_1px_3px_rgba(0,0,0,0.04)] outline-none transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_20px_44px_var(--rc-shadow)] focus-visible:shadow-[0_20px_44px_var(--rc-shadow)]"
           >
             {/* Accent hairline that draws in on hover. */}
             <span
@@ -72,7 +72,7 @@ export default function RoleChoice({ onSelect }: RoleChoiceProps) {
               <Icon className="h-7 w-7" strokeWidth={2} />
             </span>
 
-            <h2 className="mt-5 text-lg font-bold text-navy">{title}</h2>
+            <h2 className="font-display mt-5 text-xl font-bold tracking-tight text-navy">{title}</h2>
             <p className="mt-1 text-sm leading-relaxed text-mediumgray">{subtitle}</p>
 
             <ul className="mt-4 space-y-2">

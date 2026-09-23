@@ -113,7 +113,7 @@ export default function MyProgress({ data }: { data: ProgressData }) {
               <div
                 key={a.title}
                 className={`flex flex-col items-center rounded-xl border p-4 text-center ${
-                  a.earned ? "border-lightgray bg-white" : "border-dashed border-lightgray bg-[#f8fafc] opacity-60"
+                  a.earned ? "border-lightgray bg-white" : "border-dashed border-lightgray bg-surface-2 opacity-60"
                 }`}
               >
                 <span

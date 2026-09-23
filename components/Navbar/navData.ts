@@ -8,7 +8,7 @@ export const studentMenus: MenuGroup[] = [
       {
         title: "Resume Builder",
         description: "Build ATS-optimized resumes",
-        href: "/resume-builder",
+        href: "/student/resume",
       },
       {
         title: "Mock Interviews",

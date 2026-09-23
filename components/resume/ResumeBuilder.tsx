@@ -1,26 +1,53 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import {
-  ArrowLeft,
-  Check,
-  Download,
-  FilePlus2,
-  Loader2,
-  Menu,
-  Trash2,
-} from "lucide-react";
-import { useOpenMobileSidebar } from "@/components/dashboard/student/sidebar-context";
+import Link from "next/link";
+import { BadgeCheck, Check, Download, FilePlus2, Loader2, Sparkles, Trash2 } from "lucide-react";
+import DashboardShell, {
+  DashboardContainer,
+} from "@/components/dashboard/student/DashboardShell";
 import ResumeEditor from "./ResumeEditor";
 import ResumePreview from "./ResumePreview";
 import {
   atsScore,
   emptyResume,
+  type JemsImport,
+  type ProficiencyLevel,
   type ResumeData,
   type ResumeVersion,
   uid,
 } from "./types";
+
+const levelLabel = (n: number): ProficiencyLevel => (n >= 85 ? "Expert" : n >= 70 ? "Advanced" : n >= 50 ? "Intermediate" : "Beginner");
+const norm = (s: string) => s.trim().toLowerCase();
+
+/**
+ * Merges the platform's verified record into a resume: verified skills are
+ * added (or upgraded to verified if already listed), and each passed module's
+ * certificate and project is added once. Returns what changed for the toast.
+ */
+function importFromJems(data: ResumeData, jems: JemsImport): { next: ResumeData; added: number } {
+  let added = 0;
+  const skills = [...data.skills];
+  for (const s of jems.skills.filter((x) => x.verified)) {
+    const i = skills.findIndex((k) => norm(k.name) === norm(s.name));
+    if (i === -1) { skills.push({ id: uid("skill"), name: s.name, level: levelLabel(s.level), verified: true }); added++; }
+    else if (!skills[i].verified) { skills[i] = { ...skills[i], verified: true }; added++; }
+  }
+  const certifications = [...data.certifications];
+  for (const c of jems.certificates) {
+    if (certifications.some((k) => norm(k.name) === norm(c.title) && /jems/i.test(k.org))) continue;
+    certifications.push({ id: uid("cert"), name: c.title, org: c.issuer, issueDate: c.issuedAt.slice(0, 7), expDate: "" });
+    added++;
+  }
+  const projects = [...data.projects];
+  for (const p of jems.projects) {
+    if (projects.some((k) => norm(k.name) === norm(p.title))) continue;
+    projects.push({ id: uid("proj"), name: p.title, description: p.description, tech: p.tech.join(", "), link: "" });
+    added++;
+  }
+  return { next: { ...data, skills, certifications, projects }, added };
+}
 
 function timeAgo(ts: number): string {
   const s = Math.floor((Date.now() - ts) / 1000);
@@ -34,12 +61,13 @@ function timeAgo(ts: number): string {
 
 export default function ResumeBuilder({
   initialVersions,
+  jems,
 }: {
   initialVersions: ResumeVersion[];
+  jems?: JemsImport;
 }) {
-  const openMobileSidebar = useOpenMobileSidebar();
-
   const [versions, setVersions] = useState<ResumeVersion[]>(initialVersions);
+  const [importNote, setImportNote] = useState<string | null>(null);
   const [activeId, setActiveId] = useState(initialVersions[0]?.id ?? "v1");
 
   const active = versions.find((v) => v.id === activeId) ?? versions[0];
@@ -112,52 +140,45 @@ export default function ResumeBuilder({
 
   const ats = atsScore(data);
 
-  return (
-    <>
-      {/* Top bar */}
-      <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-lightgray bg-white px-4 sm:px-6 lg:px-8">
-        <button
-          type="button"
-          onClick={openMobileSidebar}
-          aria-label="Open menu"
-          className="flex h-9 w-9 items-center justify-center rounded-lg text-navy hover:bg-[#f9fafb] lg:hidden"
-        >
-          <Menu className="h-5 w-5" />
-        </button>
-        <Link
-          href="/student/dashboard"
-          className="flex items-center gap-1.5 text-sm font-medium text-mediumgray transition-colors hover:text-navy"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          <span className="hidden sm:inline">Dashboard</span>
-        </Link>
-        <div className="ml-2 border-l border-lightgray pl-3">
-          <h1 className="text-sm font-bold text-navy">Resume Builder</h1>
-          <p className="hidden text-xs text-mediumgray sm:block">
-            Create ATS-optimized resume
-          </p>
-        </div>
+  const verifiedCount = jems?.skills.filter((s) => s.verified).length ?? 0;
+  const importable = verifiedCount + (jems?.certificates.length ?? 0) + (jems?.projects.length ?? 0);
+  const runImport = () => {
+    if (!jems) return;
+    const { next, added } = importFromJems(data, jems);
+    setData(() => next);
+    setImportNote(added > 0 ? `Added ${added} verified item${added === 1 ? "" : "s"} from your JEMS portfolio.` : "Your resume already has everything JEMS has verified.");
+    setTimeout(() => setImportNote(null), 3500);
+  };
 
-        <div className="ml-auto flex items-center gap-2 text-xs font-medium text-mediumgray">
-          {saving ? (
-            <span className="inline-flex items-center gap-1.5 text-slate">
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              Saving…
-            </span>
-          ) : (
-            <span className="inline-flex items-center gap-1.5 text-emerald">
-              <Check className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">
+  return (
+    <DashboardShell>
+      <DashboardContainer className="space-y-6">
+        {/* Header */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-navy">
+              Resume Builder
+            </h1>
+            <p className="mt-1 text-sm text-mediumgray">
+              Create ATS-optimized resume
+            </p>
+          </div>
+          <div className="flex items-center gap-2 self-start text-xs font-medium text-mediumgray sm:self-auto">
+            {saving ? (
+              <span className="inline-flex items-center gap-1.5 text-slate">
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                Saving…
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 text-emerald">
+                <Check className="h-3.5 w-3.5" />
                 Saved · {timeAgo(lastSaved)}
               </span>
-              <span className="sm:hidden">Saved</span>
-            </span>
-          )}
+            )}
+          </div>
         </div>
-      </header>
 
-      <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 xl:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
           {/* ── Left: editor ───────────────────────────────── */}
           <div className="space-y-6">
             {/* ATS score */}
@@ -180,6 +201,36 @@ export default function ResumeBuilder({
               </div>
               <p className="mt-2 text-xs text-mediumgray">{ats.suggestion}</p>
             </div>
+
+            {/* Sync from the platform's verified record */}
+            {jems && (
+              <div data-tour="resume-import" className="rounded-lg border border-emerald/30 bg-emerald/5 p-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-start gap-3">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald/10 text-emerald"><BadgeCheck className="h-5 w-5" /></span>
+                    <div>
+                      <p className="text-sm font-semibold text-navy">Verified by JEMS</p>
+                      <p className="text-xs text-mediumgray">
+                        {verifiedCount} verified skill{verifiedCount === 1 ? "" : "s"} · {jems.certificates.length} certificate{jems.certificates.length === 1 ? "" : "s"} · {jems.projects.length} project{jems.projects.length === 1 ? "" : "s"} from your roadmap
+                        {jems.skills.some((s) => !s.verified) && (
+                          <> · <Link href="/student/assessment" className="font-semibold text-slate hover:underline">{jems.skills.filter((s) => !s.verified).length} claimed skill{jems.skills.filter((s) => !s.verified).length === 1 ? "" : "s"} still need a test</Link></>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={runImport}
+                    disabled={importable === 0}
+                    className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg bg-emerald px-4 py-2 text-sm font-semibold text-white transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
+                  >
+                    <Sparkles className="h-4 w-4" /> Import into resume
+                  </button>
+                </div>
+                {importNote && <p className="mt-2 text-xs font-medium text-emerald">{importNote}</p>}
+                {importable === 0 && <p className="mt-2 text-xs text-mediumgray">Verify skills in the <Link href="/student/assessment" className="font-semibold text-slate hover:underline">Skill Assessment</Link> or pass roadmap modules to earn items you can import here.</p>}
+              </div>
+            )}
 
             {/* Version controls */}
             <div className="flex flex-wrap items-center gap-2 rounded-lg border border-lightgray bg-white p-3 shadow-[0_1px_3px_rgba(0,0,0,0.08)]">
@@ -221,7 +272,7 @@ export default function ResumeBuilder({
               </button>
             </div>
 
-            <ResumeEditor data={data} setData={setData} />
+            <ResumeEditor data={data} setData={setData} verifiedSkills={jems?.skills.filter((s) => s.verified) ?? []} />
           </div>
 
           {/* ── Right: preview ─────────────────────────────── */}
@@ -242,7 +293,7 @@ export default function ResumeBuilder({
             </div>
           </div>
         </div>
-      </main>
-    </>
+      </DashboardContainer>
+    </DashboardShell>
   );
 }

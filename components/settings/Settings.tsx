@@ -139,7 +139,7 @@ export default function Settings() {
             <Field label="Desired role" value="Frontend Developer" onChange={() => {}} />
             <Field label="Expected salary" value="₹18–24 LPA" onChange={() => {}} />
           </div>
-          <div className="mt-4 flex items-center justify-between rounded-lg bg-[#f8fafc] px-4 py-3">
+          <div className="mt-4 flex items-center justify-between rounded-lg bg-surface-2 px-4 py-3">
             <div>
               <p className="text-sm font-medium text-navy">Remote roles only</p>
               <p className="text-xs text-mediumgray">Only show remote-friendly jobs</p>

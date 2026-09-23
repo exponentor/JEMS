@@ -101,7 +101,7 @@ export default function CompanyHero({
           <button
             type="button"
             onClick={() => onNavigate?.("/interview-schedule")}
-            className="rounded-full border border-lightgray bg-white px-6 py-3 text-sm font-semibold text-navy transition-colors hover:bg-[#f9fafb]"
+            className="rounded-full border border-lightgray bg-white px-6 py-3 text-sm font-semibold text-navy transition-colors hover:bg-surface-2"
           >
             Schedule Interview
           </button>

@@ -9,8 +9,6 @@ import {
   type LucideIcon,
   Mic,
   Settings,
-  Target,
-  TrendingUp,
   User,
 } from "lucide-react";
 
@@ -23,13 +21,13 @@ export interface NavItem {
 
 export const NAVIGATE: NavItem[] = [
   { label: "Dashboard", icon: LayoutDashboard, href: "/student/dashboard" },
-  { label: "Profile", icon: User, href: "/student/profile" },
+  { label: "Profile & Portfolio", icon: User, href: "/student/profile" },
   { label: "Resume Builder", icon: FileText, href: "/student/resume" },
-  { label: "Job Matches", icon: Target, href: "/student/jobs" },
   { label: "Applications", icon: Briefcase, href: "/student/applications" },
   { label: "Mock Interviews", icon: Mic, href: "/student/interviews" },
   { label: "Learning Paths", icon: GraduationCap, href: "/student/learning" },
-  { label: "My Progress", icon: TrendingUp, href: "/student/progress" },
+  // { label: "Roadmap", icon: Route, href: "/student/roadmap" },
+  // { label: "My Progress", icon: TrendingUp, href: "/student/progress" },
   { label: "Saved Jobs", icon: Bookmark, href: "/student/saved" },
 ];
 
@@ -41,6 +39,10 @@ export const MORE: NavItem[] = [
 
 /** The breadcrumb label for the current route, used by the topbar. */
 export function crumbForPath(pathname: string): string {
-  const match = [...NAVIGATE, ...MORE].find((item) => item.href === pathname);
-  return match?.label ?? "Dashboard";
+  const items = [...NAVIGATE, ...MORE];
+  const exact = items.find((item) => item.href === pathname);
+  if (exact) return exact.label;
+  // Nested routes (e.g. /student/roadmap/goals) inherit their section's label.
+  const parent = items.find((item) => item.href && pathname.startsWith(item.href + "/"));
+  return parent?.label ?? "Dashboard";
 }

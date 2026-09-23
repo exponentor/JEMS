@@ -2,18 +2,51 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 import { Suspense, useState } from "react";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Check, Eye, EyeOff, Loader2 } from "lucide-react";
 import { ForgotPasswordFlow } from "@/components/auth/ForgotPasswordFlow";
 import GithubButton from "@/components/GithubButton";
 import Logo from "@/components/Navbar/Logo";
 
-const valueProps = [
-  "AI-personalized learning paths",
-  "Real mock interviews with feedback",
-  "Smart matching to jobs that fit you",
-];
+type RoleKey = "student" | "company" | "institution" | "faculty";
+
+/** Copy per sign-in role; credentials decide the real role after login. */
+const ROLES: Record<RoleKey, { label: string; heading: string; props: string[]; demoEmail: string; quote: string; who: string }> = {
+  student: {
+    label: "Student",
+    heading: "Your dream job is closer than you think.",
+    props: ["AI skill analysis & personalised roadmaps", "Verified skills, certificates & digital portfolio", "Smart matching to internships and jobs"],
+    demoEmail: "demo@jems.dev",
+    quote: "I was stuck for 8 months. Jems got me job-ready in 4 weeks. Now earning 40% more.",
+    who: "Priya Sharma · Hired at Google",
+  },
+  company: {
+    label: "Company",
+    heading: "Hire for skills you can actually verify.",
+    props: ["Post internships & jobs with required skills", "Skill-ranked candidate shortlists", "Publish training programs & FDPs for academia"],
+    demoEmail: "company@jems.dev",
+    quote: "Our shortlist time dropped from days to minutes — every candidate came with verified skills.",
+    who: "Talent lead · Capgemini",
+  },
+  institution: {
+    label: "Institution",
+    heading: "See your students' path to placement.",
+    props: ["Cohort skill-gap statistics vs industry demand", "Internship participation & placement readiness", "Industry collaboration for your faculty"],
+    demoEmail: "institution@jems.dev",
+    quote: "For the first time the placement cell can see skill gaps before the placement season.",
+    who: "Placement officer · PES University",
+  },
+  faculty: {
+    label: "Faculty",
+    heading: "Bring industry practice into your classroom.",
+    props: ["Faculty development programs & industrial training", "Guest lectures, live projects & research partnerships", "Consultancy opportunities with industry"],
+    demoEmail: "faculty@jems.dev",
+    quote: "A four-week industrial immersion changed how I teach distributed systems.",
+    who: "Dr. Priya Nair · Associate Professor",
+  },
+};
+const DEMO_PASSWORD = "Demo@1234";
 
 /** Shown when a GitHub login is bounced here because no account exists yet. */
 function NotRegisteredNotice() {
@@ -38,6 +71,14 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [role, setRole] = useState<RoleKey>("student");
+  const copy = ROLES[role];
+
+  const useDemo = () => {
+    setEmail(copy.demoEmail);
+    setPassword(DEMO_PASSWORD);
+    setError(null);
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,7 +94,16 @@ export default function LoginPage() {
       setError("Invalid email or password.");
       return;
     }
-    router.push("/student/dashboard");
+    // Send each role to its own portal.
+    const session = await getSession();
+    const role = session?.user?.role ?? "student";
+    const home: Record<string, string> = {
+      student: "/student/dashboard",
+      company: "/company/dashboard",
+      institution: "/institution/dashboard",
+      faculty: "/faculty/dashboard",
+    };
+    router.push(home[role] ?? "/student/dashboard");
     router.refresh();
   };
 
@@ -62,8 +112,8 @@ export default function LoginPage() {
       {/* Left — brand panel (desktop only) */}
       <aside className="relative hidden overflow-hidden bg-gradient-to-br from-navy via-navy to-[#1f2937] p-12 text-white lg:flex lg:flex-col lg:justify-between">
         <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <div className="absolute -left-16 -top-16 h-72 w-72 rounded-full bg-orange/20 blur-3xl" />
-          <div className="absolute -bottom-20 -right-10 h-80 w-80 rounded-full bg-slate/20 blur-3xl" />
+          <div className="absolute -left-16 -top-16 h-72 w-72 rounded-full bg-orange/25 blur-3xl" />
+          <div className="absolute -bottom-24 -right-10 h-96 w-96 rounded-full bg-gold/15 blur-3xl" />
         </div>
 
         <div className="relative">
@@ -71,14 +121,14 @@ export default function LoginPage() {
         </div>
 
         <div className="relative max-w-md">
-          <h1 className="text-3xl font-extrabold leading-tight sm:text-4xl">
-            Your dream job is closer than you think.
+          <h1 className="font-display text-4xl font-bold leading-[1.05] tracking-[-0.025em] sm:text-5xl">
+            {copy.heading}
           </h1>
           <ul className="mt-8 space-y-4">
-            {valueProps.map((v) => (
-              <li key={v} className="flex items-center gap-3 text-lightgray">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cta-gradient text-xs font-bold text-white">
-                  ✓
+            {copy.props.map((v) => (
+              <li key={v} className="flex items-center gap-3 text-white/80">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cta-gradient text-white">
+                  <Check className="h-3.5 w-3.5" strokeWidth={3} />
                 </span>
                 {v}
               </li>
@@ -86,20 +136,14 @@ export default function LoginPage() {
           </ul>
         </div>
 
-        <figure className="relative max-w-md rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-          <blockquote className="text-sm leading-7 text-lightgray">
-            “I was stuck for 8 months. Jems got me job-ready in 4 weeks. Now
-            earning 40% more.”
-          </blockquote>
-          <figcaption className="mt-3 text-sm font-semibold text-white">
-            Priya Sharma{" "}
-            <span className="font-normal text-mediumgray">· Hired at Google</span>
-          </figcaption>
+        <figure className="relative max-w-md">
+          <blockquote className="font-display text-xl font-medium leading-snug tracking-tight text-white/90">“{copy.quote}”</blockquote>
+          <figcaption className="mt-4 text-sm text-white/60">{copy.who}</figcaption>
         </figure>
       </aside>
 
       {/* Right — login form */}
-      <main className="flex items-center justify-center px-6 py-12 sm:px-12">
+      <main id="main" className="flex items-center justify-center px-6 py-12 sm:px-12">
         <div className="w-full max-w-sm">
           {/* Mobile logo */}
           <div className="mb-8 lg:hidden">
@@ -110,32 +154,66 @@ export default function LoginPage() {
             <ForgotPasswordFlow onBackToLogin={() => setMode("login")} />
           ) : (
             <>
-              <h2 className="text-2xl font-extrabold tracking-tight text-navy">
-                Welcome back
+              {/* Who's signing in */}
+              <div role="tablist" aria-label="Sign in as" className="mb-6 grid grid-cols-4 gap-1 rounded-xl bg-surface p-1">
+                {(Object.keys(ROLES) as RoleKey[]).map((k) => (
+                  <button
+                    key={k}
+                    type="button"
+                    role="tab"
+                    aria-selected={role === k}
+                    onClick={() => { setRole(k); setError(null); }}
+                    className={`rounded-lg px-2 py-1.5 text-xs font-semibold transition-colors ${role === k ? "bg-white text-navy shadow-[0_1px_3px_rgba(0,0,0,0.08)]" : "text-mediumgray hover:text-navy"}`}
+                  >
+                    {ROLES[k].label}
+                  </button>
+                ))}
+              </div>
+
+              <h2 className="font-display text-3xl font-bold tracking-[-0.02em] text-navy">
+                {role === "student" ? "Welcome back" : `${copy.label} sign in`}
               </h2>
               <p className="mt-1 text-sm text-mediumgray">
-                New to Jems?{" "}
-                <Link
-                  href="/signup"
-                  className="font-semibold text-orange hover:underline"
-                >
-                  Create an account
-                </Link>
+                {role === "student" || role === "company" ? (
+                  <>
+                    New to Jems?{" "}
+                    <Link href="/signup" className="font-semibold text-orange hover:underline">
+                      Create an account
+                    </Link>
+                  </>
+                ) : (
+                  <>Institution and faculty accounts are provisioned by JEMS. Use the demo account below to explore.</>
+                )}
               </p>
 
               <Suspense fallback={null}>
                 <NotRegisteredNotice />
               </Suspense>
 
-              {/* Continue with GitHub */}
-              <div className="mt-8">
-                <GithubButton intent="login" />
-              </div>
+              {/* Continue with GitHub — student accounts only */}
+              {role === "student" ? (
+                <>
+                  <div className="mt-8">
+                    <GithubButton intent="login" />
+                  </div>
+                  <div className="my-5 flex items-center gap-3 text-xs text-mediumgray">
+                    <span className="h-px flex-1 bg-lightgray" />
+                    or sign in with email
+                    <span className="h-px flex-1 bg-lightgray" />
+                  </div>
+                </>
+              ) : (
+                <div className="mt-6" />
+              )}
 
-              <div className="my-5 flex items-center gap-3 text-xs text-mediumgray">
-                <span className="h-px flex-1 bg-lightgray" />
-                or sign in with email
-                <span className="h-px flex-1 bg-lightgray" />
+              {/* Demo credentials for the prototype walkthrough */}
+              <div className="mb-4 flex items-center justify-between gap-3 rounded-lg border border-dashed border-lightgray bg-surface-2 px-3.5 py-2.5 text-xs">
+                <span className="text-mediumgray">
+                  Demo {copy.label.toLowerCase()}: <span className="font-medium text-navy">{copy.demoEmail}</span>
+                </span>
+                <button type="button" onClick={useDemo} className="shrink-0 font-semibold text-slate hover:underline">
+                  Use demo login
+                </button>
               </div>
 
               <form onSubmit={submit} className="flex flex-col gap-4">
@@ -155,7 +233,7 @@ export default function LoginPage() {
                       setEmail(e.target.value);
                       setError(null);
                     }}
-                    className="w-full rounded-lg border border-lightgray px-3.5 py-2.5 text-sm text-navy outline-none transition-colors focus:border-slate focus:ring-2 focus:ring-slate/20"
+                    className="h-11 w-full rounded-lg border border-lightgray bg-white px-3.5 text-sm text-navy outline-none transition-[border-color,box-shadow] duration-200 hover:border-[#d6d0c6] focus:border-orange focus:ring-4 focus:ring-orange/15"
                     placeholder="you@example.com"
                   />
                 </div>
@@ -182,7 +260,7 @@ export default function LoginPage() {
                         setPassword(e.target.value);
                         setError(null);
                       }}
-                      className="w-full rounded-lg border border-lightgray px-3.5 py-2.5 pr-10 text-sm text-navy outline-none transition-colors focus:border-slate focus:ring-2 focus:ring-slate/20"
+                      className="h-11 w-full rounded-lg border border-lightgray bg-white px-3.5 pr-10 text-sm text-navy outline-none transition-[border-color,box-shadow] duration-200 hover:border-[#d6d0c6] focus:border-orange focus:ring-4 focus:ring-orange/15"
                       placeholder="••••••••"
                     />
                     <button
@@ -210,7 +288,7 @@ export default function LoginPage() {
                 </label>
 
                 {error && (
-                  <p className="rounded-lg bg-orange/5 px-3 py-2 text-sm text-orange">
+                  <p role="alert" className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
                     {error}
                   </p>
                 )}
@@ -219,7 +297,7 @@ export default function LoginPage() {
                   type="submit"
                   disabled={loading}
                   aria-busy={loading}
-                  className="mt-1 flex w-full items-center justify-center gap-2 rounded-full bg-cta-gradient px-5 py-3 text-sm font-semibold text-white shadow-[var(--shadow-cta)] transition-transform hover:scale-[1.02] disabled:opacity-60"
+                  className="mt-1 flex h-11 w-full items-center justify-center gap-2 rounded-full bg-cta-gradient px-5 text-sm font-semibold text-white shadow-[var(--shadow-cta)] transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-6px_rgba(234,88,12,0.5)] active:translate-y-0 disabled:pointer-events-none disabled:opacity-60"
                 >
                   {loading && <Loader2 className="h-4 w-4 animate-spin" />}
                   {loading ? "Signing in…" : "Log in"}

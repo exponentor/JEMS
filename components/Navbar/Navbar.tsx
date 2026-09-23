@@ -42,9 +42,9 @@ export default function Navbar({
   const activeMenus = userRole === "company" ? companyMenus : studentMenus;
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-lightgray/70 bg-white/95 backdrop-blur-sm shadow-[var(--shadow-soft)]">
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-navy/[0.06] bg-white/85 backdrop-blur-md">
       <div className="relative mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8">
-        <Logo className="h-16 mt-2" />
+        <Logo className="h-9" />
 
         {/* Desktop center + right (hidden on mobile) */}
         {isAuthenticated ? (
@@ -72,7 +72,7 @@ export default function Navbar({
             aria-label="Open menu"
             aria-expanded={mobileOpen}
             onClick={() => setMobileOpen(true)}
-            className="flex h-10 w-10 items-center justify-center rounded-lg text-navy transition-colors hover:bg-[#f9fafb]"
+            className="flex h-10 w-10 items-center justify-center rounded-lg text-navy transition-colors hover:bg-surface-2"
           >
             <MenuIcon />
           </button>

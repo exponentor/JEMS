@@ -39,7 +39,7 @@ export default function DesktopMegaMenu({
                     <NavigationMenuLink
                       render={<button type="button" />}
                       onClick={() => onNavigate?.(item.href)}
-                      className="group/item flex w-full flex-col items-start gap-0.5 rounded-lg p-3 text-left hover:bg-[#f9fafb]"
+                      className="group/item flex w-full flex-col items-start gap-0.5 rounded-lg p-3 text-left hover:bg-surface-2"
                     >
                       <span className="text-sm font-semibold text-navy transition-colors group-hover/item:text-slate">
                         {item.title}

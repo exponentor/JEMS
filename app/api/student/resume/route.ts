@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
+import { getVerifiedSkillNames } from "@/lib/db/assessment";
 import { getStudentResume, saveStudentResume } from "@/lib/db/student-data";
 import { readJsonLimited } from "@/lib/http";
 import { rateLimit, tooManyRequests } from "@/lib/rate-limit";
@@ -41,6 +42,18 @@ export async function PUT(request: Request) {
   const { value, error } = validateResumePayload(parsed.data);
   if (error || !value) {
     return NextResponse.json({ error: error ?? "Invalid input." }, { status: 400 });
+  }
+
+  // Assess first: a resume may only list skills JEMS has verified. Anything
+  // else in the payload (typed, tampered, stale) is dropped before saving.
+  const verified = new Set((await getVerifiedSkillNames(userId)).map((n) => n.trim().toLowerCase()));
+  for (const v of value.versions) {
+    const d = v.data as { skills?: { name?: unknown }[] };
+    if (Array.isArray(d?.skills)) {
+      d.skills = d.skills
+        .filter((s) => typeof s?.name === "string" && verified.has(s.name.trim().toLowerCase()))
+        .map((s) => ({ ...s, verified: true }));
+    }
   }
 
   const ok = await saveStudentResume(userId, value.versions, value.atsScore);

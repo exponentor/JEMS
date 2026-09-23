@@ -10,19 +10,28 @@ import Companies from "@/components/sections/Companies";
 import Features from "@/components/sections/Features";
 import FinalCTA from "@/components/sections/FinalCTA";
 import HowItWorks from "@/components/sections/HowItWorks";
+import Innovation from "@/components/sections/Innovation";
+import InstitutionalImpact from "@/components/sections/InstitutionalImpact";
 import Pricing from "@/components/sections/Pricing";
 import ProblemSection from "@/components/sections/ProblemSection";
 import SocialProof from "@/components/sections/SocialProof";
 
 export default function Home() {
   const router = useRouter();
-  const { status } = useSession();
+  const { status, data: session } = useSession();
 
-  // The landing page is for visitors only — a signed-in student belongs on
-  // their dashboard, so send them straight there.
+  // The landing page is for visitors only — a signed-in user belongs on
+  // their own portal, so send them straight there.
   useEffect(() => {
-    if (status === "authenticated") router.replace("/student/dashboard");
-  }, [status, router]);
+    if (status !== "authenticated") return;
+    const home: Record<string, string> = {
+      student: "/student/dashboard",
+      company: "/company/dashboard",
+      institution: "/institution/dashboard",
+      faculty: "/faculty/dashboard",
+    };
+    router.replace(home[session?.user?.role ?? "student"] ?? "/student/dashboard");
+  }, [status, session, router]);
 
   const goLogin = () => router.push("/login");
 
@@ -54,7 +63,7 @@ export default function Home() {
         onSignup={() => router.push("/signup")}
       />
 
-      <main>
+      <main id="main" className="pt-16">
         <Hero
           isAuthenticated={false}
           userRole={null}
@@ -66,6 +75,8 @@ export default function Home() {
         <ProblemSection />
         <HowItWorks />
         <Features />
+        <Innovation />
+        <InstitutionalImpact />
         <SocialProof />
         <Companies />
         <Pricing onStartFree={goLogin} onStartPro={goLogin} />

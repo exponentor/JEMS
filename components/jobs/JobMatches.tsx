@@ -7,15 +7,15 @@ import { Card, EmptyState } from "@/components/dashboard/student/ui";
 import type { JobMatchView } from "@/lib/db/student-data";
 
 function matchTone(match: number) {
-  if (match >= 90) return "bg-emerald/10 text-emerald";
-  if (match >= 80) return "bg-slate/10 text-slate";
+  if (match >= 70) return "bg-emerald/10 text-emerald";
+  if (match >= 40) return "bg-slate/10 text-slate";
   return "bg-gold/10 text-[#b45309]";
 }
 
 const FILTERS = [
   { key: "all", label: "All" },
   { key: "remote", label: "Remote" },
-  { key: "top", label: "90%+ match" },
+  { key: "top", label: "70%+ match" },
 ] as const;
 
 type FilterKey = (typeof FILTERS)[number]["key"];
@@ -39,7 +39,7 @@ export default function JobMatches({
     });
 
   const visible = jobs.filter((j) =>
-    filter === "remote" ? j.remote : filter === "top" ? j.match >= 90 : true,
+    filter === "remote" ? j.remote : filter === "top" ? j.match >= 70 : true,
   );
 
   if (jobs.length === 0) {
@@ -49,9 +49,9 @@ export default function JobMatches({
           <EmptyState
             icon={Target}
             title="No job matches yet"
-            hint="Complete your resume and add your skills so we can match you with roles that fit. Your best matches will appear here."
-            ctaLabel="Build your resume"
-            ctaHref="/student/resume"
+            hint="Earn verified skills on your roadmap so we can match you with roles that fit. Your best matches will appear here."
+            ctaLabel="Open my roadmap"
+            ctaHref="/student/roadmap"
           />
         </DashboardContainer>
       </DashboardShell>
@@ -99,7 +99,7 @@ export default function JobMatches({
             const isSaved = saved.has(j.id);
             return (
               <Card key={j.id} className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#f1f5f9] text-base font-bold text-navy">
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-surface text-base font-bold text-navy">
                   {j.company.charAt(0)}
                 </span>
                 <div className="min-w-0 flex-1">
@@ -119,6 +119,12 @@ export default function JobMatches({
                     <span>{j.salary}</span>
                     <span>· {j.posted}</span>
                   </p>
+                  {(j.matched.length > 0 || j.missing.length > 0) && (
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {j.matched.map((s) => <span key={s} className="rounded bg-emerald/10 px-1.5 py-0.5 text-[10px] font-medium text-emerald">✓ {s}</span>)}
+                      {j.missing.map((s) => <span key={s} className="rounded bg-red-50 px-1.5 py-0.5 text-[10px] font-medium text-red-600">✗ {s}</span>)}
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center gap-2">
                   <button

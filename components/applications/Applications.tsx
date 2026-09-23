@@ -84,7 +84,7 @@ export default function Applications({ apps }: { apps: ApplicationView[] }) {
               const stageIndex = a.status === "Rejected" ? -1 : STAGES.indexOf(a.status);
               return (
                 <li key={a.id} className="flex flex-col gap-4 px-5 py-4 sm:flex-row sm:items-center">
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#f1f5f9] text-sm font-bold text-navy">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-surface text-sm font-bold text-navy">
                     {a.company.charAt(0)}
                   </span>
                   <div className="min-w-0 flex-1">

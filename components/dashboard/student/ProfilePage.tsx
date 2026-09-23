@@ -18,6 +18,8 @@ import {
   Upload,
 } from "lucide-react";
 import DashboardShell, { DashboardContainer } from "./DashboardShell";
+import PortfolioView from "@/components/portfolio/PortfolioView";
+import type { Portfolio } from "@/lib/db/portfolio";
 import type { StudentProfileView } from "@/lib/db/student-data";
 
 type IconType = React.ComponentType<{ className?: string }>;
@@ -43,7 +45,9 @@ const AVATAR_SEEDS = [
 const avatarUrl = (seed: string) =>
   `https://api.dicebear.com/9.x/avataaars/svg?seed=${encodeURIComponent(seed)}&backgroundColor=ffd5dc,c0aede,d1d4f9,b6e3f4,ffdfbf`;
 
-const TABS = ["Profile", "Activity", "Saved Jobs", "Settings"] as const;
+const TABS = ["Profile", "Portfolio", "Activity", "Saved Jobs", "Settings"] as const;
+/** Tabs rendered on this page; the rest link out to their own routes. */
+type LocalTab = "Profile" | "Portfolio";
 const TAB_LINKS: Record<string, string> = {
   Activity: "/student/progress",
   "Saved Jobs": "/student/saved",
@@ -92,7 +96,7 @@ function Field({
           disabled={disabled}
           onChange={(e) => onChange?.(e.target.value)}
           placeholder={placeholder}
-          className={`h-11 w-full rounded-xl border border-lightgray bg-white pr-3.5 text-sm text-navy outline-none transition-colors placeholder:text-mediumgray focus:border-slate focus:ring-2 focus:ring-slate/15 disabled:bg-[#f1f5f9] disabled:text-mediumgray ${
+          className={`h-11 w-full rounded-xl border border-lightgray bg-white pr-3.5 text-sm text-navy outline-none transition-colors placeholder:text-mediumgray focus:border-slate focus:ring-2 focus:ring-slate/15 disabled:bg-surface disabled:text-mediumgray ${
             Icon ? "pl-9" : "pl-3.5"
           }`}
         />
@@ -158,14 +162,27 @@ function toForm(p: StudentProfileView): Form {
 
 export default function ProfilePage({
   profile,
+  portfolio,
+  shareUrl,
   stats,
+  initialTab = "Profile",
 }: {
   profile: StudentProfileView;
+  portfolio: Portfolio;
+  shareUrl: string;
   stats: ProfileStats;
+  initialTab?: LocalTab;
 }) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
-  const [activeTab, setActiveTab] = useState<string>("Profile");
+  const [activeTab, setActiveTab] = useState<LocalTab>(initialTab);
+
+  // Keep the tab in the URL so a refresh (or a shared link) lands on it.
+  const switchTab = (tab: LocalTab) => {
+    setActiveTab(tab);
+    const url = tab === "Portfolio" ? "/student/profile?tab=portfolio" : "/student/profile";
+    window.history.replaceState(null, "", url);
+  };
 
   // `saved` is the last persisted snapshot; `form` is the working copy.
   const [saved, setSaved] = useState<Form>(() => toForm(profile));
@@ -279,15 +296,15 @@ export default function ProfilePage({
             {/* Tabs */}
             <div className="mt-5 flex gap-1 overflow-x-auto border-t border-lightgray pt-3">
               {TABS.map((tab) =>
-                tab === "Profile" ? (
+                tab === "Profile" || tab === "Portfolio" ? (
                   <button
                     key={tab}
                     type="button"
-                    onClick={() => setActiveTab(tab)}
+                    onClick={() => switchTab(tab)}
                     className={`rounded-lg px-3.5 py-2 text-sm font-medium transition-colors ${
                       activeTab === tab
                         ? "bg-slate/10 text-slate"
-                        : "text-mediumgray hover:bg-[#f1f5f9] hover:text-navy"
+                        : "text-mediumgray hover:bg-surface hover:text-navy"
                     }`}
                   >
                     {tab}
@@ -296,7 +313,7 @@ export default function ProfilePage({
                   <Link
                     key={tab}
                     href={TAB_LINKS[tab]}
-                    className="rounded-lg px-3.5 py-2 text-sm font-medium text-mediumgray transition-colors hover:bg-[#f1f5f9] hover:text-navy"
+                    className="rounded-lg px-3.5 py-2 text-sm font-medium text-mediumgray transition-colors hover:bg-surface hover:text-navy"
                   >
                     {tab}
                   </Link>
@@ -306,7 +323,10 @@ export default function ProfilePage({
           </div>
         </div>
 
+        {activeTab === "Portfolio" && <PortfolioView data={portfolio} shareUrl={shareUrl} />}
+
         {/* Account management + profile information */}
+        {activeTab === "Profile" && (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           {/* Left: account management */}
           <div className="space-y-6">
@@ -314,7 +334,7 @@ export default function ProfilePage({
               <SectionTitle>Account Management</SectionTitle>
 
               {/* Current photo */}
-              <div className="relative mt-4 aspect-square w-full overflow-hidden rounded-2xl bg-[#f1f5f9]">
+              <div className="relative mt-4 aspect-square w-full overflow-hidden rounded-2xl bg-surface">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={form.avatar}
@@ -364,7 +384,7 @@ export default function ProfilePage({
                         type="button"
                         onClick={() => set("avatar", url)}
                         aria-label={`Avatar ${seed}`}
-                        className={`relative aspect-square overflow-hidden rounded-full bg-[#f1f5f9] transition-transform hover:scale-110 ${
+                        className={`relative aspect-square overflow-hidden rounded-full bg-surface transition-transform hover:scale-110 ${
                           selected
                             ? "ring-2 ring-slate ring-offset-2"
                             : "ring-1 ring-lightgray"
@@ -485,7 +505,7 @@ export default function ProfilePage({
                   type="button"
                   onClick={onCancel}
                   disabled={!dirty || status === "saving"}
-                  className="rounded-xl border border-lightgray px-5 py-2.5 text-sm font-semibold text-navy transition-colors hover:bg-[#f1f5f9] disabled:opacity-50"
+                  className="rounded-xl border border-lightgray px-5 py-2.5 text-sm font-semibold text-navy transition-colors hover:bg-surface disabled:opacity-50"
                 >
                   Cancel
                 </button>
@@ -501,6 +521,7 @@ export default function ProfilePage({
             </form>
           </div>
         </div>
+        )}
       </DashboardContainer>
     </DashboardShell>
   );

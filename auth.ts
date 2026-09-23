@@ -97,7 +97,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.uid as string;
-        session.user.role = token.role as "student" | "company";
+        session.user.role = token.role as "student" | "company" | "institution" | "faculty";
       }
       return session;
     },

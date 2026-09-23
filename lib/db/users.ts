@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { getDatabase } from "@/lib/db/mongodb";
 
-export type UserRole = "student" | "company";
+export type UserRole = "student" | "company" | "institution" | "faculty";
 export type AuthProvider = "credentials" | "github";
 
 export interface UserDoc {

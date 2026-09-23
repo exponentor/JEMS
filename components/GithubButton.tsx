@@ -50,7 +50,7 @@ export default function GithubButton({
       onClick={start}
       disabled={loading}
       aria-busy={loading}
-      className={`group flex w-full items-center justify-center gap-3 rounded-full bg-[#1b1f24] px-5 py-3 text-sm font-semibold text-white shadow-[0_2px_8px_rgba(0,0,0,0.18)] transition-all hover:bg-[#24292f] hover:shadow-[0_6px_16px_rgba(0,0,0,0.24)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1b1f24]/40 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-80 ${className}`}
+      className={`group flex w-full items-center justify-center gap-3 rounded-lg bg-[#1b1f24] px-5 py-3 text-sm font-semibold text-white shadow-[0_1px_2px_rgba(0,0,0,0.1)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#24292f] hover:shadow-[0_6px_16px_rgba(0,0,0,0.18)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1b1f24]/40 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-80 disabled:hover:translate-y-0 ${className}`}
     >
       {loading ? (
         <>

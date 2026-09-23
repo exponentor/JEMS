@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   type LucideIcon,
   Check,
   Mail,
   MessageCircle,
   Phone,
+  X,
 } from "lucide-react";
+import ComposeDemo from "@/components/compose/ComposeDemo";
 import DashboardShell, { DashboardContainer } from "@/components/dashboard/student/DashboardShell";
 import { Card } from "@/components/dashboard/student/ui";
 
@@ -57,6 +59,13 @@ export default function Support() {
   const [category, setCategory] = useState("");
   const [message, setMessage] = useState("");
   const [sent, setSent] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
+  const chatRef = useRef<HTMLDivElement>(null);
+
+  // Bring the chat into view when it's opened from the channel card.
+  useEffect(() => {
+    if (chatOpen) chatRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [chatOpen]);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,6 +101,7 @@ export default function Support() {
                 <p className="mt-1 flex-1 text-[11px] font-medium text-mediumgray">{c.status}</p>
                 <button
                   type="button"
+                  onClick={c.title === "Live Chat" ? () => setChatOpen(true) : undefined}
                   className="mt-4 w-full rounded-lg border border-lightgray py-2.5 text-sm font-semibold text-navy transition-colors hover:border-slate hover:text-slate"
                 >
                   {c.cta}
@@ -100,6 +110,28 @@ export default function Support() {
             );
           })}
         </div>
+
+        {/* Live chat */}
+        {chatOpen && (
+          <Card className="scroll-mt-20" ref={chatRef}>
+            <div className="flex items-center justify-between border-b border-lightgray px-5 py-3.5">
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-emerald" />
+                <h2 className="text-sm font-semibold text-navy">Live chat</h2>
+                <span className="text-xs text-mediumgray">· Avg reply &lt; 2 min</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setChatOpen(false)}
+                aria-label="Close chat"
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-mediumgray transition-colors hover:bg-surface hover:text-navy"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <ComposeDemo className="p-5" />
+          </Card>
+        )}
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
           {/* Submit a ticket */}

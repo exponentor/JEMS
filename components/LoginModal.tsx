@@ -185,7 +185,7 @@ export default function LoginModal({
                 key={acct.email}
                 type="button"
                 onClick={() => quickFill(acct)}
-                className="flex items-center justify-between rounded-lg border border-lightgray px-3 py-2 text-left text-sm transition-colors hover:bg-[#f9fafb]"
+                className="flex items-center justify-between rounded-lg border border-lightgray px-3 py-2 text-left text-sm transition-colors hover:bg-surface-2"
               >
                 <span className="font-medium capitalize text-navy">
                   {acct.role}
