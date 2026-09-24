@@ -32,7 +32,6 @@ interface ModuleConfig {
   key: string;
   icon: React.ElementType;
   title: string;
-  subtitle: string;
   description: string;
   features: { title: string; desc: string }[];
   tone: JourneyTone;
@@ -51,7 +50,6 @@ const MODULES: ModuleConfig[] = [
     key: "student",
     icon: GraduationCap,
     title: "Student Module",
-    subtitle: "🎓",
     description:
       "Build a verified profile, assess your skills against industry benchmarks, and get matched to internships & roles that fit your career path.",
     features: [
@@ -78,7 +76,6 @@ const MODULES: ModuleConfig[] = [
     key: "company",
     icon: Building2,
     title: "Industry Module",
-    subtitle: "🏢",
     description:
       "Post opportunities, discover talent ranked by verified evidence, and run training programs that build your future workforce.",
     features: [
@@ -105,7 +102,6 @@ const MODULES: ModuleConfig[] = [
     key: "faculty",
     icon: BookOpen,
     title: "Academician Module",
-    subtitle: "👨‍🏫",
     description:
       "Explore faculty internships, industrial training, and research collaborations to align teaching with real-world industry practices.",
     features: [
@@ -132,7 +128,6 @@ const MODULES: ModuleConfig[] = [
     key: "institution",
     icon: School,
     title: "Institution Module",
-    subtitle: "🏫",
     description:
       "Monitor student progress, track placement outcomes, manage industry partnerships, and make data-driven decisions with analytics.",
     features: [
@@ -305,15 +300,12 @@ export default function Home() {
               />
 
               <div className="relative z-10 p-8 md:p-10">
-                {/* Icon + Badge Row */}
-                <div className="flex items-center gap-3">
-                  <span
-                    className={`inline-flex h-12 w-12 items-center justify-center rounded-xl ${mod.iconBg} ${mod.iconColor} transition-transform duration-300 group-hover:scale-110`}
-                  >
-                    <mod.icon className="h-6 w-6" strokeWidth={1.75} />
-                  </span>
-                  <span className="text-2xl">{mod.subtitle}</span>
-                </div>
+                {/* Icon */}
+                <span
+                  className={`inline-flex h-12 w-12 items-center justify-center rounded-xl ${mod.iconBg} ${mod.iconColor} transition-transform duration-300 group-hover:scale-110`}
+                >
+                  <mod.icon className="h-6 w-6" strokeWidth={1.75} />
+                </span>
 
                 {/* Title */}
                 <h2 className="font-display mt-5 text-2xl font-bold tracking-tight text-navy md:text-3xl">

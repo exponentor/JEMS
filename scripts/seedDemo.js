@@ -63,7 +63,7 @@ async function seed() {
 
     // ── User ─────────────────────────────────────────────────────
     const userRes = await db.collection("users").insertOne({
-      name: "Alex Morgan",
+      name: "Rahul Verma",
       email: DEMO_EMAIL,
       role: "student",
       authProvider: "credentials",
@@ -80,19 +80,19 @@ async function seed() {
     // ── Profile (skills feed the dashboard + progress) ───────────
     await db.collection("studentProfiles").insertOne({
       userId: studentId,
-      username: "alex.morgan",
-      firstName: "Alex",
-      lastName: "Morgan",
-      nickname: "Alex",
-      displayName: "Alex Morgan",
+      username: "rahul.verma",
+      firstName: "Rahul",
+      lastName: "Verma",
+      nickname: "Rahul",
+      displayName: "Rahul Verma",
       displayRole: "Student",
       bio: "Aspiring frontend developer passionate about building delightful, accessible web experiences with React and TypeScript. Looking for my first full-time role.",
       location: "Bengaluru, India",
-      website: "alexmorgan.dev",
-      linkedin: "https://linkedin.com/in/alexmorgan",
-      github: "https://github.com/alexmorgan",
-      whatsapp: "@alex-morgan",
-      telegram: "@alex-morgan",
+      website: "rahulverma.dev",
+      linkedin: "https://linkedin.com/in/rahulverma",
+      github: "https://github.com/rahulverma",
+      whatsapp: "@rahul-verma",
+      telegram: "@rahul-verma",
       phone: "+91 98765 43210",
       avatar:
         "https://api.dicebear.com/9.x/avataaars/svg?seed=Felix&backgroundColor=b6e3f4,c0aede,d1d4f9",
@@ -173,13 +173,13 @@ async function seed() {
     // ── Resume ───────────────────────────────────────────────────
     const resumeData = {
       header: {
-        fullName: "Alex Morgan",
+        fullName: "Rahul Verma",
         title: "Frontend Developer",
         email: DEMO_EMAIL,
         phone: "+91 98765 43210",
         location: "Bengaluru, India",
-        portfolio: "alexmorgan.dev",
-        linkedin: "linkedin.com/in/alexmorgan",
+        portfolio: "rahulverma.dev",
+        linkedin: "linkedin.com/in/rahulverma",
       },
       summary:
         "Frontend developer with a strong foundation in React and TypeScript, focused on building accessible, performant web interfaces. Eager to grow into a product-focused engineering role.",
@@ -201,7 +201,7 @@ async function seed() {
         { id: "cert-1", name: "Meta Front-End Developer", org: "Coursera", issueDate: "2024-02", expDate: "" },
       ],
       projects: [
-        { id: "proj-1", name: "DevBoard", description: "A kanban board for developers with offline support and keyboard-first navigation.", tech: "React, TypeScript, IndexedDB", link: "github.com/alexmorgan/devboard" },
+        { id: "proj-1", name: "DevBoard", description: "A kanban board for developers with offline support and keyboard-first navigation.", tech: "React, TypeScript, IndexedDB", link: "github.com/rahulverma/devboard" },
       ],
     };
     await db.collection("resumes").insertOne({
