@@ -9,6 +9,7 @@ import {
   upsertGithubStudent,
 } from "@/lib/db/users";
 import { rateLimit } from "@/lib/rate-limit";
+import { DEMO_EMAILS } from "@/lib/demo";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true,
@@ -31,7 +32,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         // Throttle credential-stuffing / brute force: 10 tries per email per
         // 5 minutes. Returns null (generic failure) once exceeded.
-        if (!(await rateLimit(`login:${email}`, 10, 5 * 60_000)).ok) return null;
+        //
+        // Demo accounts are exempt: their credentials are public by design, so
+        // there is nothing to brute force, and every visitor shares the same
+        // address -- a busy demo would otherwise lock the account for everyone.
+        if (!DEMO_EMAILS.has(email)) {
+          if (!(await rateLimit(`login:${email}`, 10, 5 * 60_000)).ok) return null;
+        }
 
         const user = await getUserByEmail(email);
         if (!user?.passwordHash) return null;

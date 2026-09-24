@@ -19,6 +19,11 @@ export interface NavItem {
   href?: string;
 }
 
+/** `data-tour` anchor for a nav item, e.g. "nav-resume" for /student/resume. */
+export function navTourId(item: NavItem): string | undefined {
+  return item.href ? `nav-${item.href.split("/").pop()}` : undefined;
+}
+
 export const NAVIGATE: NavItem[] = [
   { label: "Dashboard", icon: LayoutDashboard, href: "/student/dashboard" },
   { label: "Profile & Portfolio", icon: User, href: "/student/profile" },

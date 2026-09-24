@@ -4,8 +4,10 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { BarChart3, Briefcase, GraduationCap, Handshake, LayoutDashboard, LogOut, type LucideIcon, Menu, Users, X } from "lucide-react";
+import { BarChart3, Briefcase, GraduationCap, Handshake, HelpCircle, LayoutDashboard, LogOut, type LucideIcon, Menu, Users, X } from "lucide-react";
 import Logo from "@/components/Navbar/Logo";
+import { useTour } from "@/components/tour/TourProvider";
+import type { TourId } from "@/components/tour/tours";
 
 /** Icon *names* — server layouts can't pass component functions to a client component. */
 const ICONS: Record<string, LucideIcon> = { BarChart3, Briefcase, GraduationCap, Handshake, LayoutDashboard, Users };
@@ -26,15 +28,19 @@ export default function PortalShell({
   nav,
   name,
   email,
+  tour,
   children,
 }: {
   roleLabel: string;
   nav: PortalNavItem[];
   name: string;
   email: string;
+  /** Guided tour replayed from the header's help button. */
+  tour?: TourId;
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const { start: startTour } = useTour();
   const [open, setOpen] = useState(false);
   const initial = name.trim().charAt(0).toUpperCase() || "U";
   const current = nav.find((n) => pathname === n.href || pathname.startsWith(n.href + "/"));
@@ -45,7 +51,7 @@ export default function PortalShell({
         const active = pathname === item.href || pathname.startsWith(item.href + "/");
         const Icon = ICONS[item.icon] ?? LayoutDashboard;
         return (
-          <li key={item.href}>
+          <li key={item.href} data-tour={`nav-${item.href.split("/").pop()}`}>
             <Link
               href={item.href}
               onClick={() => setOpen(false)}
@@ -105,6 +111,17 @@ export default function PortalShell({
             <span>/</span>
             <span className="font-medium text-navy" aria-current="page">{current?.label ?? "Dashboard"}</span>
           </nav>
+          {tour && (
+            <button
+              type="button"
+              data-tour="help"
+              onClick={() => startTour(tour)}
+              className="ml-auto inline-flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-[13px] font-medium text-mediumgray transition-colors hover:bg-surface hover:text-navy"
+            >
+              <HelpCircle className="h-5 w-5" />
+              <span className="hidden sm:inline">Take the tour</span>
+            </button>
+          )}
         </header>
         <main id="main" className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
           <div data-tour="page" className="mx-auto max-w-7xl">{children}</div>

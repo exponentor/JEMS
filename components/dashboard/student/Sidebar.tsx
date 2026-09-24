@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
-import { MORE, NAVIGATE, type NavItem } from "./nav-items";
+import { MORE, NAVIGATE, navTourId, type NavItem } from "./nav-items";
 
 /** Text that is hidden while the rail is collapsed and fades in on hover — or always shown once pinned open. */
 function revealClass(pinned: boolean) {
@@ -55,7 +55,7 @@ function NavList({
             </>
           );
           return (
-            <li key={item.label}>
+            <li key={item.label} data-tour={navTourId(item)}>
               {item.href ? (
                 <Link href={item.href} onClick={onNavigate} aria-current={isActive ? "page" : undefined} className={cls}>
                   {inner}

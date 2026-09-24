@@ -8,7 +8,7 @@ const NAV: PortalNavItem[] = [
 export default async function FacultyLayout({ children }: { children: React.ReactNode }) {
   const session = await requireRole("faculty");
   return (
-    <PortalShell roleLabel="Faculty" nav={NAV} name={session.user.name ?? "Faculty"} email={session.user.email ?? ""}>
+    <PortalShell tour="faculty" roleLabel="Faculty" nav={NAV} name={session.user.name ?? "Faculty"} email={session.user.email ?? ""}>
       {children}
     </PortalShell>
   );

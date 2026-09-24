@@ -64,7 +64,7 @@ export default function CollaborationBoard({
         <p className="mt-1 text-sm text-mediumgray">Faculty development programs, industrial training, guest lectures, research and consultancy published by industry partners.</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div data-tour="collab-stats" className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {[
           { label: "Open opportunities", value: local.length, icon: Handshake },
           { label: "FDPs & training", value: local.filter((c) => /FDP|Training|Internship/.test(c.type)).length, icon: Users },
@@ -78,13 +78,13 @@ export default function CollaborationBoard({
         ))}
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div data-tour="collab-filters" className="flex flex-wrap gap-2">
         {available.map((t) => (
           <button key={t} type="button" onClick={() => setFilter(t)} className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors ${filter === t ? "bg-navy text-white" : "border border-lightgray bg-white text-mediumgray hover:text-navy"}`}>{t}</button>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+      <div data-tour="collab-grid" className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
         {visible.map((c) => (
           <Card key={c.id} className={`flex flex-col p-5 ${c.mine ? "border-emerald/40" : ""}`}>
             <div className="flex items-start justify-between gap-2">

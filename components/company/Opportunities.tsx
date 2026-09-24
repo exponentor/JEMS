@@ -42,15 +42,15 @@ export default function Opportunities({ company, openings }: { company: string; 
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <PageHead company={company} title="Internships & job opportunities" hint="Every opening carries the skills it requires — that's what the Matching Agent uses to rank students for you." />
+        <PageHead company={company} title="Jobs / Internships" hint="Every opening carries the skills it requires — that's what the Matching Agent uses to rank students for you." />
         <button type="button" onClick={() => setShowForm((v) => !v)} className={showForm ? secondaryBtn : primaryBtn}>
-          {showForm ? <><X className="h-4 w-4" /> Cancel</> : <><Plus className="h-4 w-4" /> Post an opportunity</>}
+          {showForm ? <><X className="h-4 w-4" /> Cancel</> : <><Plus className="h-4 w-4" /> Post a job / internship</>}
         </button>
       </div>
 
       {showForm && (
         <Card className="p-6">
-          <h2 className="text-sm font-semibold text-navy">New opportunity</h2>
+          <h2 className="text-sm font-semibold text-navy">New job / internship</h2>
           <form onSubmit={submit} className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
             <Field label="Role title *"><input required value={form.role} onChange={set("role")} placeholder="e.g. Frontend Developer Intern" className={inputClass} /></Field>
             <Field label="Type *">

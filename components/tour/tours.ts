@@ -14,7 +14,7 @@ export type TourPillar =
   | "Platform"
   | "Collaboration";
 
-export type TourId = "landing" | "student";
+export type TourId = "landing" | "student" | "company" | "faculty" | "institution";
 
 export interface TourStep {
   target: string;
@@ -26,11 +26,14 @@ export interface TourStep {
   placement?: "top" | "bottom" | "left" | "right" | "auto" | "center";
   /** Highlight a wider element than the one the tooltip anchors to. */
   spotlight?: string;
+  /** Skip below the `lg` breakpoint, e.g. sidebar items hidden in the mobile drawer. */
+  desktopOnly?: boolean;
 }
 
-/** Any student page's first card — set by DashboardContainer. */
-const PAGE_HERO = '[data-tour="page"] > :first-child';
-const PAGE_SECOND = '[data-tour="page"] > :nth-child(2)';
+const DASH = "/student/dashboard";
+const COMPANY = "/company/dashboard";
+const FACULTY = "/faculty/dashboard";
+const INSTITUTION = "/institution/dashboard";
 
 export const TOURS: Record<TourId, { title: string; steps: TourStep[] }> = {
   // ── Pre-login: the pitch, end to end ─────────────────────────────────
@@ -43,189 +46,473 @@ export const TOURS: Record<TourId, { title: string; steps: TourStep[] }> = {
         pillar: "Platform",
         title: "An Academia–Industry Collaboration Portal",
         content:
-          "JEMS is a single platform where students discover the skills industry actually wants, industries find candidates who have them, and institutions watch the whole pipeline. This 60-second tour walks through how the prototype covers the full skill → internship → placement lifecycle.",
+          "One platform connecting students, industries, academicians and institutions. This quick tour shows how JEMS covers the full journey from skill building to internships and placements.",
       },
+      // Module cards sit in a 2-column grid: left-column cards put the tooltip
+      // on the right and vice versa. Joyride flips it on narrow screens.
       {
-        target: "#problem",
-        placement: "top",
-        pillar: "Platform",
-        title: "The gap we're closing",
-        content:
-          "Students can't see which skills their target role needs. Industries can't find candidates with the right skill sets. Academicians have little visibility into industry exposure. Every feature that follows exists to remove one of those three gaps.",
-      },
-      {
-        target: "#how-it-works",
-        placement: "top",
+        target: '[data-tour="student-card"]',
+        placement: "right",
         pillar: "Skill Development",
-        title: "Assess → Map → Learn → Apply → Place",
+        title: "Student module",
         content:
-          "A student sets a career goal, gets a skill profile with gaps, follows an industry-aligned roadmap with quizzes that verify each skill, is matched to internships and jobs by skill compatibility, and tracks every application to placement.",
+          "Students get clear guidance and a personalised roadmap shaped by what industry actually requires. A skill assessment shows the gap to their target role, roadmap quizzes verify each skill as they learn it, and that verified profile matches them to the right internships and jobs.",
       },
       {
-        target: "#features",
-        placement: "top",
-        pillar: "Skill Development",
-        title: "Skill profiling, roadmaps, verified portfolio",
-        content:
-          "Personalised roadmaps recommend roles, modules and certifications aligned to industry demand. Passing a module credits a verified skill to the student's digital portfolio, which feeds job matching and the resume builder.",
-      },
-      {
-        target: "#companies",
-        placement: "top",
+        target: '[data-tour="company-card"]',
+        placement: "left",
         pillar: "Placement",
-        title: "The industry side",
+        title: "Industry module",
         content:
-          "Companies post internships, projects, apprenticeships and entry-level roles with required skills, publish learning programs, and get skill-compatibility shortlists plus recruitment analytics on their own dashboard.",
+          "Companies post internships and roles with the skills they need, and get AI-ranked shortlists of candidates whose skills are already verified. They can also run training programs and track hiring through recruitment analytics.",
       },
       {
-        target: "#get-started",
+        target: '[data-tour="faculty-card"]',
+        placement: "right",
+        pillar: "Collaboration",
+        title: "Academician module",
+        content:
+          "Academicians gain industry exposure through internships, industrial training and FDPs, and join research collaborations. Live insight into skill demand keeps their teaching relevant as they mentor students.",
+      },
+      {
+        target: '[data-tour="institution-card"]',
+        placement: "left",
+        pillar: "Platform",
+        title: "Institution module",
+        content:
+          "Institutions monitor every student's skill growth and placement readiness in one place. They manage industry partnerships and MoUs, and export analytics for accreditation and audits.",
+      },
+      {
+        target: '[data-tour="student-button"]',
         placement: "top",
         pillar: "Platform",
-        title: "Role-based access",
+        title: "Start your journey",
         content:
-          "One account system, four workspaces: students (assessment → roadmap → matching), industry (post openings, skill-ranked shortlists, publish programs), academicians (FDPs, faculty internships, research) and institutions (cohort analytics). Sign in as a student to see the live workspace tour.",
+          "Choose your role and step inside to see how JEMS works for you, from building skills to getting hired. You can replay this tour anytime from the header.",
       },
     ],
   },
 
-  // ── Post-login: the student workspace, page by page ──────────────────
+  // ── Post-login: the student dashboard, section by section ────────────
+  // Every step lives on the dashboard, so replaying from any student page
+  // brings the student back here first.
   student: {
-    title: "Your JEMS workspace",
+    title: "Your JEMS dashboard",
     steps: [
       {
-        route: "/student/dashboard",
+        route: DASH,
+        target: '[data-tour="page"]',
+        placement: "center",
+        pillar: "Platform",
+        title: "Welcome to your dashboard",
+        content:
+          "This is your home base for building skills and landing internships and jobs. Let's take a quick look at what's here.",
+      },
+      {
+        route: DASH,
         target: '[data-tour="dashboard-stats"]',
         placement: "bottom",
         pillar: "Platform",
-        title: "Your dashboard",
+        title: "Your progress at a glance",
         content:
-          "Job readiness, applications, interviews and learning progress at a glance — the same signals an institution's analytics dashboard aggregates across its students.",
+          "Job readiness, applications, interviews and learning progress in one row. These numbers update as you learn, apply and practise.",
       },
       {
-        route: "/student/dashboard",
-        target: '[data-tour="sidebar"]',
-        placement: "right",
-        pillar: "Platform",
-        title: "One workspace for the whole lifecycle",
-        content:
-          "Everything from skill assessment to placement lives in this sidebar. Let's walk through it in the order a student would actually use it.",
-      },
-      {
-        route: "/student/assessment",
-        target: '[data-tour="assessment-steps"]',
+        route: DASH,
+        target: '[data-tour="dashboard-roadmap"]',
         placement: "bottom",
         pillar: "Skill Development",
-        title: "Skill assessment comes first",
+        title: "Your personalised roadmap",
         content:
-          "Students rate the skills industry actually lists in its openings, plus a soft-skill and aptitude questionnaire. Those are *claimed* skills — the Assessment Agent then verifies each one with a server-graded skill test. Only verified skills reach the resume, portfolio and matching.",
+          "A step-by-step learning plan for your target role, built from what industry actually requires. Each module ends with a quiz that verifies the skill.",
       },
       {
-        route: "/student/analysis",
-        target: '[data-tour="analysis-inputs"]',
+        route: DASH,
+        target: '[data-tour="dashboard-next-steps"]',
         placement: "bottom",
         pillar: "Skill Development",
-        title: "Skill assessment: your data meets industry data",
+        title: "Your next steps",
         content:
-          "Your profile, skills and career goal on the left; the skills companies are actually asking for in live openings on the right. This is what the AI layer analyses.",
+          "JEMS suggests what to do next, from finishing your profile to your next module. Follow these and you'll always know where to focus.",
       },
       {
-        route: "/student/analysis",
-        target: '[data-tour="analysis-agents"]',
-        placement: "bottom",
-        pillar: "Platform",
-        title: "Multi-agent AI layer",
-        content:
-          "Six coordinated agents — Analysis, Roadmap, Learning, Assessment, Matching, Collaboration — run under an orchestrator and show their reasoning. In this prototype they're rule-based; the Ollama integration point is ready for a real model.",
-      },
-      {
-        route: "/student/roadmap",
-        target: PAGE_HERO,
-        placement: "bottom",
-        pillar: "Skill Development",
-        title: "Skill mapping → personalised roadmap",
-        content:
-          "Pick a target career (pre-selected from your signup answers) and JEMS generates a phase-by-phase roadmap: the modules, topics and skills industry expects for that role. Skills you already hold are marked; the rest are your gaps.",
-      },
-      {
-        route: "/student/roadmap",
-        target: PAGE_SECOND,
+        route: DASH,
+        target: '[data-tour="dashboard-jobs"]',
         placement: "top",
-        pillar: "Skill Development",
-        title: "Verified skills, not self-declared ones",
-        content:
-          "Each module has narrated lessons and a quiz graded on the server. Modules unlock sequentially, and passing one credits its skills to your profile — that's what makes the portfolio 'verified'.",
-      },
-      {
-        route: "/student/learning",
-        target: PAGE_HERO,
-        placement: "bottom",
-        pillar: "Skill Development",
-        title: "Industry learning programs",
-        content:
-          "Training programs, certification courses and workshops published by companies, recommended against your skill gaps. Progress here feeds your readiness score.",
-      },
-      {
-        route: "/student/jobs",
-        target: PAGE_HERO,
-        placement: "bottom",
         pillar: "Placement",
-        title: "Recommendation engine",
+        title: "Top job matches",
         content:
-          "Internships and jobs posted by industry, ranked by how well your verified skill profile matches the role's required skills. Apply directly from here.",
+          "Internships and jobs ranked by how well your verified skills match each role. The higher the match, the better your chances.",
       },
       {
-        route: "/student/applications",
-        target: PAGE_HERO,
-        placement: "bottom",
-        pillar: "Internship",
-        title: "Application tracking",
-        content:
-          "Every internship and job application in one place — applied, shortlisted, interview, offer. Recruiters update the status from their side; you see it here.",
-      },
-      {
-        route: "/student/interviews",
-        target: PAGE_HERO,
-        placement: "bottom",
-        pillar: "Placement",
-        title: "Placement readiness",
-        content:
-          "AI mock interviews for the roles you're targeting, with scores and feedback that count toward your readiness percentage.",
-      },
-      {
-        route: "/student/profile",
-        target: PAGE_HERO,
-        placement: "bottom",
-        pillar: "Skill Development",
-        title: "Profile & verified portfolio",
-        content:
-          "Edit your profile here, and open the Portfolio tab for skills verified by quizzes, a certificate per passed module, projects, internships and achievements — with a public link recruiters and institutions can open.",
-      },
-      {
-        route: "/student/resume",
-        target: '[data-tour="resume-import"]',
-        placement: "bottom",
-        pillar: "Placement",
-        title: "Resume that reflects the portfolio",
-        content:
-          "One click imports every JEMS-verified skill, certificate and roadmap project into the resume, with a verified mark recruiters can trust. ATS scoring and versions are built in.",
-      },
-      {
-        route: "/student/progress",
-        target: PAGE_HERO,
-        placement: "bottom",
+        route: DASH,
+        target: '[data-tour="dashboard-profile"]',
+        placement: "left",
         pillar: "Platform",
-        title: "Analytics",
+        title: "Profile completion",
         content:
-          "Skill growth, streaks, achievements and readiness over time. The institution view aggregates exactly these numbers across a cohort to monitor skill development and placement progress.",
+          "A complete profile gets you matched first. Add your resume and skills to reach 100% and unlock priority matching.",
       },
       {
-        route: "/student/dashboard",
+        route: DASH,
+        target: '[data-tour="dashboard-upcoming"]',
+        placement: "left",
+        pillar: "Internship",
+        title: "Upcoming",
+        content:
+          "Interviews, deadlines and events you've signed up for, so nothing slips past you.",
+      },
+      {
+        route: DASH,
+        target: '[data-tour="dashboard-skills"]',
+        placement: "left",
+        pillar: "Skill Development",
+        title: "Your verified skills",
+        content:
+          "Skills you've proven through assessments and roadmap quizzes. These are what recruiters see and what job matching is based on.",
+      },
+      {
+        route: DASH,
+        target: '[data-tour="dashboard-activity"]',
+        placement: "left",
+        pillar: "Platform",
+        title: "Recent activity",
+        content: "A running log of what you've done lately, from modules passed to applications sent.",
+      },
+      {
+        route: DASH,
+        target: '[data-tour="nav-profile"]',
+        placement: "right",
+        desktopOnly: true,
+        pillar: "Skill Development",
+        title: "Profile & Portfolio",
+        content:
+          "Your profile and a shareable portfolio of verified skills, certificates, projects and achievements.",
+      },
+      {
+        route: DASH,
+        target: '[data-tour="nav-resume"]',
+        placement: "right",
+        desktopOnly: true,
+        pillar: "Placement",
+        title: "Resume Builder",
+        content:
+          "Build an ATS-friendly resume in minutes. Your verified skills and certificates are imported with one click.",
+      },
+      {
+        route: DASH,
+        target: '[data-tour="nav-applications"]',
+        placement: "right",
+        desktopOnly: true,
+        pillar: "Internship",
+        title: "Applications",
+        content:
+          "Track every internship and job application, from applied to shortlisted, interview and offer.",
+      },
+      {
+        route: DASH,
+        target: '[data-tour="nav-interviews"]',
+        placement: "right",
+        desktopOnly: true,
+        pillar: "Placement",
+        title: "Mock Interviews",
+        content:
+          "Practise AI mock interviews for the roles you're targeting and get scores and feedback to improve.",
+      },
+      {
+        route: DASH,
+        target: '[data-tour="nav-learning"]',
+        placement: "right",
+        desktopOnly: true,
+        pillar: "Skill Development",
+        title: "Learning Paths",
+        content:
+          "Training programs, courses and workshops from industry, recommended to close your skill gaps.",
+      },
+      {
+        route: DASH,
+        target: '[data-tour="nav-saved"]',
+        placement: "right",
+        desktopOnly: true,
+        pillar: "Placement",
+        title: "Saved Jobs",
+        content: "Bookmark roles you like and come back to apply when you're ready.",
+      },
+      {
+        route: DASH,
         target: '[data-tour="help"]',
         placement: "bottom",
         pillar: "Platform",
-        title: "That's the tour",
+        title: "You're all set",
         content:
-          "You can replay it any time from this help button. Next: set your career goal on the Roadmap page and start your first module.",
+          "Replay this tour anytime from this help button. A good first move: open your roadmap and start your first module.",
+      },
+    ],
+  },
+
+  // ── Industry portal ──────────────────────────────────────────────────
+  company: {
+    title: "Your Industry portal",
+    steps: [
+      {
+        route: COMPANY,
+        target: '[data-tour="page"]',
+        placement: "center",
+        pillar: "Placement",
+        title: "Welcome to your Industry portal",
+        content:
+          "Post jobs and internships, discover students with verified skills, and build your future workforce, all from one place. Here's a quick look around.",
+      },
+      {
+        route: COMPANY,
+        target: '[data-tour="company-kpis"]',
+        placement: "bottom",
+        pillar: "Platform",
+        title: "Your hiring at a glance",
+        content:
+          "Open jobs and internships, applicants, offers, learning programs and academia collaborations. These numbers update as students apply and progress.",
+      },
+      {
+        route: COMPANY,
+        target: '[data-tour="company-post"]',
+        placement: "left",
+        pillar: "Internship",
+        title: "Post a job or internship",
+        content:
+          "List the role along with the skills it requires. JEMS uses those skills to find and rank the students who match best.",
+      },
+      {
+        route: COMPANY,
+        target: '[data-tour="company-applicants"]',
+        placement: "top",
+        pillar: "Placement",
+        title: "Recent applicants",
+        content:
+          "Every applicant comes with a skill-match score built on verified skills, not self-reported claims, so the strongest fits stand out.",
+      },
+      {
+        route: COMPANY,
+        target: '[data-tour="company-pipeline"]',
+        placement: "left",
+        pillar: "Placement",
+        title: "Hiring pipeline",
+        content: "See how many candidates are at each stage, from applied to shortlisted, interviewing and offered.",
+      },
+      {
+        route: COMPANY,
+        target: '[data-tour="company-skills"]',
+        placement: "left",
+        pillar: "Skill Development",
+        title: "Skills you're hiring for",
+        content:
+          "The skills your openings ask for most. This demand also guides what students learn and what institutions focus on.",
+      },
+      {
+        route: COMPANY,
+        target: '[data-tour="company-openings"]',
+        placement: "top",
+        pillar: "Internship",
+        title: "Your openings",
+        content:
+          "All your active jobs and internships. Open the shortlist on any role to see students ranked by how well they match.",
+      },
+      {
+        route: COMPANY,
+        target: '[data-tour="nav-opportunities"]',
+        placement: "right",
+        desktopOnly: true,
+        pillar: "Internship",
+        title: "Jobs / Internships",
+        content: "Create and manage every job, internship, apprenticeship and project, each with the skills it requires.",
+      },
+      {
+        route: COMPANY,
+        target: '[data-tour="nav-candidates"]',
+        placement: "right",
+        desktopOnly: true,
+        pillar: "Placement",
+        title: "Candidates",
+        content:
+          "Skill-ranked shortlists for each opening. Review verified profiles and move candidates through your hiring pipeline.",
+      },
+      {
+        route: COMPANY,
+        target: '[data-tour="nav-programs"]',
+        placement: "right",
+        desktopOnly: true,
+        pillar: "Collaboration",
+        title: "Programs",
+        content:
+          "Publish training, workshops and mentorships for students, and collaborations like FDPs and research projects for academicians.",
+      },
+      {
+        route: COMPANY,
+        target: '[data-tour="help"]',
+        placement: "bottom",
+        pillar: "Platform",
+        title: "You're all set",
+        content: "Replay this tour anytime from here. A good first move: post a job or internship and see who matches.",
+      },
+    ],
+  },
+
+  // ── Academician portal ───────────────────────────────────────────────
+  faculty: {
+    title: "Your Academician portal",
+    steps: [
+      {
+        route: FACULTY,
+        target: '[data-tour="page"]',
+        placement: "center",
+        pillar: "Collaboration",
+        title: "Welcome to your Academician portal",
+        content:
+          "Connect with industry through FDPs, faculty internships, industrial training and research, and bring real-world practice into your teaching.",
+      },
+      {
+        route: FACULTY,
+        target: '[data-tour="collab-stats"]',
+        placement: "bottom",
+        pillar: "Collaboration",
+        title: "Collaboration at a glance",
+        content:
+          "How many programs are open, how many are FDPs and training or research and consultancy, and how many you've shown interest in.",
+      },
+      {
+        route: FACULTY,
+        target: '[data-tour="collab-filters"]',
+        placement: "bottom",
+        pillar: "Collaboration",
+        title: "Find what fits you",
+        content:
+          "Filter by type, such as FDPs, faculty internships, guest lectures, research or live projects, to see only what's relevant to you.",
+      },
+      {
+        route: FACULTY,
+        target: '[data-tour="collab-grid"] > :first-child',
+        placement: "right",
+        pillar: "Collaboration",
+        title: "Programs from industry partners",
+        content:
+          "Each card shows the company, dates, duration, location, seats and focus areas, so you can decide at a glance.",
+      },
+      {
+        route: FACULTY,
+        target: '[data-tour="collab-grid"] > :first-child button',
+        placement: "bottom",
+        pillar: "Collaboration",
+        title: "Express interest",
+        content:
+          "One click tells the company and your institution you'd like to join. You can withdraw anytime.",
+      },
+      {
+        route: FACULTY,
+        target: '[data-tour="help"]',
+        placement: "bottom",
+        pillar: "Platform",
+        title: "You're all set",
+        content: "Replay this tour anytime from here. Start by filtering for FDPs or faculty internships in your field.",
+      },
+    ],
+  },
+
+  // ── Institution portal ───────────────────────────────────────────────
+  institution: {
+    title: "Your Institution portal",
+    steps: [
+      {
+        route: INSTITUTION,
+        target: '[data-tour="page"]',
+        placement: "center",
+        pillar: "Platform",
+        title: "Welcome to your Institution portal",
+        content:
+          "Monitor how your students progress from skill gaps to internships and placements, and manage your industry partnerships, all in one place.",
+      },
+      {
+        route: INSTITUTION,
+        target: '[data-tour="inst-kpis"]',
+        placement: "bottom",
+        pillar: "Platform",
+        title: "Your institution at a glance",
+        content:
+          "Students, average placement readiness, verified skills earned, applications and offers, updated as your students progress.",
+      },
+      {
+        route: INSTITUTION,
+        target: '[data-tour="inst-skill-gaps"]',
+        placement: "right",
+        pillar: "Skill Development",
+        title: "Skill gap statistics",
+        content:
+          "Compare what industry demands with how many of your students have verified each skill. The biggest gaps show where to focus training.",
+      },
+      {
+        route: INSTITUTION,
+        target: '[data-tour="inst-demand"]',
+        placement: "top",
+        pillar: "Skill Development",
+        title: "Industry demand trends",
+        content: "The skills most requested in current openings, so your curriculum can keep pace with industry.",
+      },
+      {
+        route: INSTITUTION,
+        target: '[data-tour="inst-readiness"]',
+        placement: "left",
+        pillar: "Placement",
+        title: "Placement readiness",
+        content: "How many students fall into each readiness band, so you can support those who need it most.",
+      },
+      {
+        route: INSTITUTION,
+        target: '[data-tour="inst-pipeline"]',
+        placement: "left",
+        pillar: "Internship",
+        title: "Application pipeline",
+        content: "Track your students' internship and job applications, from applied to interview and offer.",
+      },
+      {
+        route: INSTITUTION,
+        target: '[data-tour="inst-interests"]',
+        placement: "right",
+        pillar: "Platform",
+        title: "Career interests",
+        content: "The target roles your students have chosen, to guide placement drives and industry outreach.",
+      },
+      {
+        route: INSTITUTION,
+        target: '[data-tour="inst-collab"]',
+        placement: "top",
+        pillar: "Collaboration",
+        title: "Industry collaboration",
+        content:
+          "Upcoming FDPs, training and research programs from industry partners, and how many of your faculty are interested.",
+      },
+      {
+        route: INSTITUTION,
+        target: '[data-tour="inst-students"]',
+        placement: "top",
+        pillar: "Placement",
+        title: "Every student, in one table",
+        content:
+          "Sort students by readiness, modules passed or applications to spot who's thriving and who needs support.",
+      },
+      {
+        route: INSTITUTION,
+        target: '[data-tour="nav-collaborations"]',
+        placement: "right",
+        desktopOnly: true,
+        pillar: "Collaboration",
+        title: "Collaborations",
+        content: "Browse every industry program open to your faculty, from FDPs to research and live projects.",
+      },
+      {
+        route: INSTITUTION,
+        target: '[data-tour="help"]',
+        placement: "bottom",
+        pillar: "Platform",
+        title: "You're all set",
+        content: "Replay this tour anytime from here. Start with the skill gap statistics to see where your students need support.",
       },
     ],
   },

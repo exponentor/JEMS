@@ -29,7 +29,8 @@ interface TourContextValue {
 
 const TourContext = createContext<TourContextValue | null>(null);
 
-const seenKey = (id: TourId) => `jems.tour.${id}.seen`;
+// Bump the version when a tour is rewritten so it autostarts once more.
+const seenKey = (id: TourId) => `jems.tour.${id}.v2.seen`;
 
 /** Polls until `selector` exists in the DOM (and we're on `route`, if given). */
 function waitForTarget(selector: string, route?: string, timeoutMs = 8000): Promise<void> {
@@ -78,7 +79,8 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
 
   const steps = useMemo<Step[]>(() => {
     if (!active) return [];
-    return TOURS[active].steps.map((s) => ({
+    const desktop = window.matchMedia("(min-width: 1024px)").matches;
+    return TOURS[active].steps.filter((s) => desktop || !s.desktopOnly).map((s) => ({
       target: s.target,
       title: s.title,
       content: s.content,

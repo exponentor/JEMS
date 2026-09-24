@@ -77,7 +77,7 @@ export default function InstitutionDashboard({ data }: { data: Data }) {
       </div>
 
       {/* KPI tiles */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+      <div data-tour="inst-kpis" className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
         {tiles.map((t) => (
           <Card key={t.label} className="p-5">
             <div className="flex items-start justify-between">
@@ -91,20 +91,20 @@ export default function InstitutionDashboard({ data }: { data: Data }) {
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <Card className="p-6">
+        <Card data-tour="inst-skill-gaps" className="p-6">
           <Head icon={Zap} title="Skill gap statistics" hint="Industry demand vs. share of students with the skill verified" />
           <Bars rows={data.skillGaps.slice(0, 8).map((g) => ({ label: g.skill, value: g.coverage, hint: `${g.demand} openings ask for it` }))} max={100} format={(v) => `${v}% verified`} />
         </Card>
-        <Card className="p-6">
+        <Card data-tour="inst-demand" className="p-6">
           <Head icon={TrendingUp} title="Industry demand trends" hint="Skills most requested in current openings" />
           <Bars rows={data.demandTrends.map((d) => ({ label: d.skill, value: d.openings }))} format={(v) => `${v} openings`} />
         </Card>
         <div className="space-y-6">
-          <Card className="p-6">
+          <Card data-tour="inst-readiness" className="p-6">
             <Head icon={Target} title="Placement readiness" hint="Students per readiness band" />
             <Bars rows={data.readinessBuckets.map((b) => ({ label: b.label, value: b.count }))} format={(v) => `${v} students`} />
           </Card>
-          <Card className="p-6">
+          <Card data-tour="inst-pipeline" className="p-6">
             <Head icon={Briefcase} title="Application pipeline" />
             <Bars rows={data.applicationsByStatus.map((s) => ({ label: s.status, value: s.count }))} />
           </Card>
@@ -112,11 +112,11 @@ export default function InstitutionDashboard({ data }: { data: Data }) {
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <Card className="p-6">
+        <Card data-tour="inst-interests" className="p-6">
           <Head icon={Users} title="Career interests" hint="Target roles chosen by students" />
           <Bars rows={data.targetRoles.map((r) => ({ label: r.role, value: r.count }))} format={(v) => `${v}`} />
         </Card>
-        <Card className="p-6 xl:col-span-2">
+        <Card data-tour="inst-collab" className="p-6 xl:col-span-2">
           <Head icon={Handshake} title="Industry collaboration" hint="Upcoming FDPs, training and research programs open to your faculty" />
           <ul className="divide-y divide-lightgray">
             {data.collaborations.map((c) => (
@@ -134,7 +134,7 @@ export default function InstitutionDashboard({ data }: { data: Data }) {
       </div>
 
       {/* Students table */}
-      <Card>
+      <Card data-tour="inst-students">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-lightgray px-5 py-3.5">
           <h2 className="text-sm font-semibold text-navy">Students</h2>
           <div className="flex gap-1.5">

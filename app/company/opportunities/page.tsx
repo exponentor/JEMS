@@ -4,7 +4,7 @@ import Opportunities from "@/components/company/Opportunities";
 import { requireRole } from "@/lib/auth/require-role";
 import { getCompanyContext, listOpenings } from "@/lib/db/company";
 
-export const metadata: Metadata = { title: "Opportunities — Jems" };
+export const metadata: Metadata = { title: "Jobs / Internships — Jems" };
 
 export default async function OpportunitiesPage() {
   const session = await requireRole("company");

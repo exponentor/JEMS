@@ -165,6 +165,7 @@ export default function StudentDashboard({ data }: { data: DashboardData }) {
           </div>
           <Link
             href="/student/roadmap"
+            data-tour="dashboard-roadmap"
             className="group inline-flex items-center justify-center gap-1.5 self-start rounded-lg bg-navy px-4 py-2.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-[#1f2937] sm:self-auto"
           >
             Open my roadmap
@@ -203,7 +204,7 @@ export default function StudentDashboard({ data }: { data: DashboardData }) {
           {/* Left column */}
           <div className="space-y-6 lg:col-span-2">
             {/* Next steps */}
-            <Card>
+            <Card data-tour="dashboard-next-steps">
               <SectionHead title="Your next steps" />
               {nextSteps.length === 0 ? (
                 <p className="px-5 py-8 text-center text-sm text-mediumgray">
@@ -238,7 +239,7 @@ export default function StudentDashboard({ data }: { data: DashboardData }) {
             </Card>
 
             {/* Job matches */}
-            <Card>
+            <Card data-tour="dashboard-jobs">
               <SectionHead title="Top job matches" action="View all" href="/student/jobs" />
               {data.jobs.length === 0 ? (
                 <p className="px-5 py-8 text-center text-sm text-mediumgray">
@@ -276,7 +277,7 @@ export default function StudentDashboard({ data }: { data: DashboardData }) {
           {/* Right column */}
           <div className="space-y-6">
             {/* Profile completion */}
-            <Card className="p-5">
+            <Card data-tour="dashboard-profile" className="p-5">
               <div className="flex items-center justify-between">
                 <h2 className="text-sm font-semibold text-navy">Profile completion</h2>
                 <span className="text-sm font-bold text-orange tabular">{data.readiness}%</span>
@@ -294,7 +295,7 @@ export default function StudentDashboard({ data }: { data: DashboardData }) {
             </Card>
 
             {/* Upcoming */}
-            <Card>
+            <Card data-tour="dashboard-upcoming">
               <SectionHead title="Upcoming" />
               {data.upcoming.length === 0 ? (
                 <p className="px-5 py-6 text-center text-xs text-mediumgray">
@@ -318,7 +319,7 @@ export default function StudentDashboard({ data }: { data: DashboardData }) {
             </Card>
 
             {/* Skills */}
-            <Card className="p-5">
+            <Card data-tour="dashboard-skills" className="p-5">
               <h2 className="text-sm font-semibold text-navy">Your skills</h2>
               {data.skills.length === 0 ? (
                 <p className="mt-3 text-xs text-mediumgray">
@@ -349,7 +350,7 @@ export default function StudentDashboard({ data }: { data: DashboardData }) {
             </Card>
 
             {/* Recent activity */}
-            <Card>
+            <Card data-tour="dashboard-activity">
               <SectionHead title="Recent activity" />
               {data.activity.length === 0 ? (
                 <p className="px-5 py-6 text-center text-xs text-mediumgray">
