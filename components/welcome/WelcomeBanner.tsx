@@ -107,7 +107,7 @@ export default function WelcomeBanner({ onStartTour, onDismiss }: WelcomeBannerP
 
       <p className="mt-3 max-w-[48ch] text-center text-[15px] leading-7 text-ink-soft">
         You&apos;re looking at the JEMS portal, where students build the
-        skills industry needs with proper guidance, companies hire with ease,
+        skills that industry needs with proper guidance, companies hire with ease,
         academicians grow through FDPs, and institutions monitor progress
         every step of the way.
       </p>
